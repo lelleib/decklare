@@ -1,0 +1,12 @@
+    PLUS 1 CARD
+    PLUS 1 Action
+    FOR AllPlayers {
+        top_card: NEW PILE
+        POP 1 FROM Deck AND PUT IT TO top_card
+        LET ActivePlayer CHOOSE 1 FROM {
+            TAKE ALL FROM top_card AND PUT IT TO Discard
+        }
+        AND {
+            TAKE ALL FROM top_card AND PUT IT TO Deck
+        }
+    }

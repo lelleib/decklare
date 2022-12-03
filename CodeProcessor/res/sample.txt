@@ -1,0 +1,1 @@
+POP 1 FROM Deck AND PUT IT TO top_card
