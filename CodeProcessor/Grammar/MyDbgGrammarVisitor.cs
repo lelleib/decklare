@@ -95,6 +95,38 @@ namespace CodeProcessor.Grammar
             return base.VisitVarRef(context);
         }
 
+        public override object VisitNumericExpression([NotNull] DbgGrammarParser.NumericExpressionContext context)
+        {
+            VerifyNumericExpression(context);
+            return base.VisitNumericExpression(context);
+        }
+        
+        public override object VisitBooleanExpression([NotNull] DbgGrammarParser.BooleanExpressionContext context)
+        {
+            VerifyBooleanExpression(context);
+            return base.VisitBooleanExpression(context);
+        }
+        
+        public override object VisitNumberPredicate([NotNull] DbgGrammarParser.NumberPredicateContext context)
+        {
+            // create nested scope and add input variable
+            this.currentScope = new Scope(this.currentScope);
+            AddVariable("x", SymbolType.NUMBER);
+            var result = base.VisitNumberPredicate(context);
+            this.currentScope = this.currentScope.Parent;
+            return result;
+        }
+        
+        public override object VisitCardPredicate([NotNull] DbgGrammarParser.CardPredicateContext context)
+        {
+            // create nested scope and add input variable
+            this.currentScope = new Scope(this.currentScope);
+            AddVariable("x", SymbolType.CARD);
+            var result = base.VisitCardPredicate(context);
+            this.currentScope = this.currentScope.Parent;
+            return result;
+        }
+
         private void VerifyCommand([NotNull] DbgGrammarParser.CommandContext context)
         {
             var signature = GetCommandSignature(context);
@@ -123,6 +155,30 @@ namespace CodeProcessor.Grammar
             if (type == null)
             {
                 Console.WriteLine($"Error at 43: variable '{context.GetText()}' does not exist");
+            }
+        }
+
+        private void VerifyNumericExpression([NotNull] DbgGrammarParser.NumericExpressionContext context)
+        {
+            var varRef = context.varRef();
+            if (varRef != null)
+            {
+                var type = GetVariableType(varRef);
+                if (type != null && type != SymbolType.NUMBER) // TODO type compatibility check
+                {
+                    Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is not of type NUMBER");
+                } 
+            }
+        }
+        
+
+        private void VerifyBooleanExpression([NotNull] DbgGrammarParser.BooleanExpressionContext context)
+        {
+            var varRef = context.varRef();
+            var type = GetVariableType(varRef);
+            if (type != null && type != SymbolType.BOOLEAN) // TODO type compatibility check
+            {
+                Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is not of type NUMBER");
             }
         }
 

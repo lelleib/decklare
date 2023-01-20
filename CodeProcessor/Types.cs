@@ -15,6 +15,10 @@ namespace CodeProcessor
         public static SymbolType PILE;
         public static SymbolType SUPPLY;
         public static SymbolType NUMBER;
+        public static SymbolType BOOLEAN;
+        public static SymbolType EFFECT;
+        public static SymbolType NUMBERPREDICATE;
+        public static SymbolType CARDPREDICATE;
         public static SymbolType ENUM;
         public static SymbolType PLAYER;
         public static SymbolType LIST;

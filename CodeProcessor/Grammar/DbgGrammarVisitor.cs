@@ -141,5 +141,17 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitListHasExpression([NotNull] DbgGrammarParser.ListHasExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.numberPredicate"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNumberPredicate([NotNull] DbgGrammarParser.NumberPredicateContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.cardPredicate"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCardPredicate([NotNull] DbgGrammarParser.CardPredicateContext context);
 }
 } // namespace CodeProcessor.Grammar
