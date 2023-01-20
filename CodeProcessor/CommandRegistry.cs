@@ -9,7 +9,7 @@ namespace CodeProcessor
         public SymbolType[] Arguments {get; set;}
     }
 
-    public class Commands
+    public class CommandRegistry
     {
         Dictionary<string, CommandSignature> commandTable = new Dictionary<string, CommandSignature>();
 

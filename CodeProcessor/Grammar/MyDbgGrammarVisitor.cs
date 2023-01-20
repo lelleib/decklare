@@ -42,7 +42,7 @@ namespace CodeProcessor.Grammar
 
         private TypeSystem typeSystem;
         private Scope currentScope;
-        private Commands commands;
+        private CommandRegistry commandRegistry;
 
         public override object VisitProgram([NotNull] DbgGrammarParser.ProgramContext context)
         {
@@ -130,7 +130,7 @@ namespace CodeProcessor.Grammar
         {
             try
             {
-                this.commands[commandId] = signature;
+                this.commandRegistry[commandId] = signature;
             }
             catch (Exception ex)
             {
@@ -167,7 +167,7 @@ namespace CodeProcessor.Grammar
 
         private CommandSignature GetCommandSignature([NotNull] DbgGrammarParser.CommandContext context)
         {
-            var signature = this.commands[GetCommandIdFromCWs(context.CW())];
+            var signature = this.commandRegistry[GetCommandIdFromCWs(context.CW())];
             return signature;
         }
 
