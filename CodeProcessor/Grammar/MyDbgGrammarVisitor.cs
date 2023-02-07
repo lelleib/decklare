@@ -242,14 +242,24 @@ namespace CodeProcessor.Grammar
             var block = context.block();
             if (block != null)
             {
-                return new SymbolType("BLOCK");
+                return SymbolType.EFFECT;
             }
             var numericExpression = context.numericExpression();
             if (numericExpression != null)
             {
-                return new SymbolType("NUMBER");
+                return SymbolType.NUMBER;
             }
-            return new SymbolType("BOOLEAN");
+            var booleanExpression = context.booleanExpression();
+            if (booleanExpression != null)
+            {
+                return SymbolType.BOOLEAN;
+            }
+            var numberPredicate = context.numberPredicate();
+            if (numberPredicate != null)
+            {
+                return SymbolType.NUMBERPREDICATE;
+            }
+            return SymbolType.CARDPREDICATE;
         }
 
         private SymbolType GetAssigneeType([NotNull] DbgGrammarParser.StatementContext context)
