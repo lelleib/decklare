@@ -43,6 +43,7 @@ namespace CodeProcessor.Grammar
         private TypeSystem typeSystem;
         private Scope currentScope;
         private CommandRegistry commandRegistry;
+        private List<(string, SymbolType)> nextBlockArguments = new List<(string, SymbolType)>();
 
         public override object VisitProgram([NotNull] DbgGrammarParser.ProgramContext context)
         {
@@ -52,13 +53,24 @@ namespace CodeProcessor.Grammar
             {
                 this.currentScope[item.Name] = item.Type;
             }
+            this.commandRegistry = new CommandRegistry();
+            foreach (var item in builtInCommands)
+            {
+                this.commandRegistry[item.Item1] = item.Item2;
+            }
             return base.VisitProgram(context);
         }
 
         public override object VisitBlock([NotNull] DbgGrammarParser.BlockContext context)
         {
-            // create nested scope
+            // create nested scope and add arguments
             this.currentScope = new Scope(this.currentScope);
+            foreach (var item in nextBlockArguments)
+            {
+                this.currentScope[item.Item1] = item.Item2;
+            }
+            nextBlockArguments.Clear();
+
             var result = base.VisitBlock(context);
             this.currentScope = this.currentScope.Parent;
             return result;
@@ -66,7 +78,7 @@ namespace CodeProcessor.Grammar
 
         public override object VisitStatement([NotNull] DbgGrammarParser.StatementContext context)
         {
-            // create variable for assignment
+            // create variable if assignment
             var assignment = context.assignment();
             if (assignment != null)
             {
@@ -76,11 +88,10 @@ namespace CodeProcessor.Grammar
             return base.VisitStatement(context);
         }
 
-        public override object VisitCommandDefinition([NotNull] DbgGrammarParser.CommandDefinitionContext context)
+        public override object VisitCommandDeclaration([NotNull] DbgGrammarParser.CommandDeclarationContext context)
         {
-            var arguments = context.commandDeclaration().argumentDeclaration().Select(ctx => GetVerifyTypeDefinition(ctx.typeDefinition())).ToArray();
-            AddCommand(GetCommandIdFromCWs(context.commandDeclaration().CW()), new CommandSignature { CommandType = null, Arguments = arguments });
-            return base.VisitCommandDefinition(context);
+            AddVerifyCommandDeclaration(context);
+            return base.VisitCommandDeclaration(context);
         }
 
         public override object VisitCommand([NotNull] DbgGrammarParser.CommandContext context)
@@ -182,8 +193,16 @@ namespace CodeProcessor.Grammar
             }
         }
 
-        private void AddCommand(string commandId, CommandSignature signature)
+        private void AddVerifyCommandDeclaration([NotNull] DbgGrammarParser.CommandDeclarationContext context)
         {
+            var commandId = GetCommandIdFromCWs(context.CW());
+
+            var argumentNames = context.argumentDeclaration().Select(ctx => ctx.name.Text).ToArray();
+            var arguments = context.argumentDeclaration().Select(ctx => GetVerifyTypeDefinition(ctx.typeDefinition())).ToArray();
+            var signature = new CommandSignature { CommandType = SymbolType.VOID, Arguments = arguments };
+
+            nextBlockArguments.AddRange(argumentNames.Zip(arguments));
+            
             try
             {
                 this.commandRegistry[commandId] = signature;
