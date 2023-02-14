@@ -103,7 +103,7 @@ namespace CodeProcessor.Grammar
                 {
                     var type = GetExpressionType(arguments[i]);
                     var expectedType = signature.Arguments[i];
-                    if (type != expectedType)
+                    if (type != expectedType) // TODO type compatibility check
                     {
                         Console.WriteLine($"Error at 46: The command's {i + 1}. argument have a wrong type ({type} instead of {expectedType})");
                     }
@@ -136,10 +136,33 @@ namespace CodeProcessor.Grammar
         public void VerifyBooleanExpression(DbgGrammarParser.BooleanExpressionContext context)
         {
             var varRef = context.varRef();
-            var type = GetVariableType(varRef);
-            if (type != null && type != SymbolType.BOOLEAN) // TODO type compatibility check
+            if (varRef != null)
             {
-                Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is not of type NUMBER");
+                var type = GetVariableType(varRef);
+                if (type != null && type != SymbolType.BOOLEAN) // TODO type compatibility check
+                {
+                    Console.WriteLine($"Error at 49: variable '{varRef.GetText()}' used in boolean expression but is not of type BOOLEAN");
+                }
+            }
+        }
+
+        public void VerifyEnumIsExpression(DbgGrammarParser.EnumIsExpressionContext context)
+        {
+            var varRefs = context.varRef(); // TODO implement enum literal syntax
+        }
+
+        public void VerifyListHasExpression(DbgGrammarParser.ListHasExpressionContext context)
+        {
+            var varRefs = context.varRef();
+            var firstOperandType = GetVariableType(varRefs[0]);
+            var secondOperandType = GetVariableType(varRefs[1]);
+            if (firstOperandType != SymbolType.LIST)
+            {
+                Console.WriteLine($"Error at 50: {ex.Message}");
+            }
+            if (secondOperandType != firstOperandType.SubType) // TODO fix type system representation
+            {
+                Console.WriteLine($"Error at 50: {ex.Message}");
             }
         }
 
@@ -188,7 +211,7 @@ namespace CodeProcessor.Grammar
             string varName = context.ID().First().Symbol.Text;
             string[] memberPath = context.ID().Skip(1).Select(id => id.Symbol.Text).ToArray();
             var type = this.currentScope[varName];
-            if (type == null || memberPath == null)
+            if (type == null || memberPath == null) // TODO memberPath==null === no members?
             {
                 return type;
             }
@@ -200,8 +223,8 @@ namespace CodeProcessor.Grammar
 
         private CommandSignature GetCommandSignature(DbgGrammarParser.CommandContext context)
         {
-            var signature = this.commandRegistry[GetCommandIdFromCWs(context.CW())];
-            return signature;
+            var commandId = GetCommandIdFromCWs(context.CW());
+            return this.commandRegistry[commandId];
         }
 
         private SymbolType GetCommandType(DbgGrammarParser.CommandContext context)

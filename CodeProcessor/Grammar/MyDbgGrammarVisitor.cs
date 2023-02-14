@@ -50,6 +50,18 @@ namespace CodeProcessor.Grammar
             return base.VisitBooleanExpression(context);
         }
 
+        public override object VisitEnumIsExpression([NotNull] DbgGrammarParser.EnumIsExpressionContext context)
+        {
+            ctlr.VerifyEnumIsExpression(context);
+            return base.VisitEnumIsExpression(context);
+        }
+
+        public override object VisitListHasExpression([NotNull] DbgGrammarParser.ListHasExpressionContext context)
+        {
+            ctlr.VerifyListHasExpression(context);
+            return base.VisitListHasExpression(context);
+        }
+
         public override object VisitNumberPredicate([NotNull] DbgGrammarParser.NumberPredicateContext context)
         {
             ctlr.PushNewPredicateScope(SymbolType.NUMBER);
