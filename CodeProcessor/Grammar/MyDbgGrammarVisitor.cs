@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Antlr4.Runtime.Misc;
@@ -9,15 +10,15 @@ namespace CodeProcessor.Grammar
     {
         private readonly (string, CommandSignature)[] builtInCommands =
         {
-            ("LET (player: &PLAYER) ARRANGE (pile: &PILE)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
+            ("Let1Arrange2", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE}}),
             ("SET (variable: &ENUM<T>) TO (value: ENUM<T>)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("SET (variable: &NUMBER) TO (value: NUMBER)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("SHUFFLE (pile: &PILE)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("ROTATE (pile: &PILE)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("EXECUTE (effect: EFFECT)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("CLONE (effect: EFFECT)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("DETACH (effect: EFFECT) FROM CARD", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("INIT DOMINION", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}})
+            ("Set1To2", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.NUMBER,SymbolType.NUMBER}}),
+            ("Shuffle1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PILE}}),
+            ("Rotate1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PILE}}),
+            ("Execute1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
+            ("Clone1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
+            ("Detach1FromCard", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
+            ("InitDominion", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{}})
         };
         private readonly ScopeSymbol[] builtInVars =
         {
@@ -63,28 +64,15 @@ namespace CodeProcessor.Grammar
 
         public override object VisitBlock([NotNull] DbgGrammarParser.BlockContext context)
         {
-            // create nested scope and add arguments
-            this.currentScope = new Scope(this.currentScope);
-            foreach (var item in nextBlockArguments)
-            {
-                this.currentScope[item.Item1] = item.Item2;
-            }
-            nextBlockArguments.Clear();
-
+            PushNewScope();
             var result = base.VisitBlock(context);
-            this.currentScope = this.currentScope.Parent;
+            PopScope();
             return result;
         }
 
         public override object VisitStatement([NotNull] DbgGrammarParser.StatementContext context)
         {
-            // create variable if assignment
-            var assignment = context.assignment();
-            if (assignment != null)
-            {
-                // add newly created variable to scope
-                AddVariable(assignment.varName.Text, GetAssigneeType(context));
-            }
+            AddVariableFromAssignment(context);
             return base.VisitStatement(context);
         }
 
@@ -105,7 +93,7 @@ namespace CodeProcessor.Grammar
             VerifyVarRef(context);
             return base.VisitVarRef(context);
         }
-
+        
         public override object VisitNumericExpression([NotNull] DbgGrammarParser.NumericExpressionContext context)
         {
             VerifyNumericExpression(context);
@@ -120,22 +108,46 @@ namespace CodeProcessor.Grammar
         
         public override object VisitNumberPredicate([NotNull] DbgGrammarParser.NumberPredicateContext context)
         {
-            // create nested scope and add input variable
-            this.currentScope = new Scope(this.currentScope);
-            AddVariable("x", SymbolType.NUMBER);
+            PushNewPredicateScope(SymbolType.NUMBER);
             var result = base.VisitNumberPredicate(context);
-            this.currentScope = this.currentScope.Parent;
+            PopScope();
             return result;
         }
         
         public override object VisitCardPredicate([NotNull] DbgGrammarParser.CardPredicateContext context)
         {
-            // create nested scope and add input variable
-            this.currentScope = new Scope(this.currentScope);
-            AddVariable("x", SymbolType.CARD);
+            PushNewPredicateScope(SymbolType.CARD);
             var result = base.VisitCardPredicate(context);
-            this.currentScope = this.currentScope.Parent;
+            PopScope();
             return result;
+        }
+
+        private void PushNewScope()
+        {
+            // create nested scope and add arguments
+            this.currentScope = new Scope(this.currentScope);
+            foreach (var item in nextBlockArguments)
+            {
+                this.currentScope[item.Item1] = item.Item2;
+            }
+            nextBlockArguments.Clear();
+        }
+
+        private void PopScope()
+        {
+            this.currentScope = this.currentScope.Parent;
+        }
+
+        private void AddVariableFromAssignment([NotNull] DbgGrammarParser.StatementContext context)
+        {
+            // add variable if assignment
+            var assignment = context.assignment();
+            if (assignment != null)
+            {
+                var varName = assignment.varName.Text;
+                var varType = GetAssigneeType(context);
+                AddVariable(varName, varType);
+            }
         }
 
         private void VerifyCommand([NotNull] DbgGrammarParser.CommandContext context)
@@ -211,6 +223,13 @@ namespace CodeProcessor.Grammar
             {
                 Console.WriteLine($"Error at 44: {ex.Message}");
             }
+        }
+
+        private void PushNewPredicateScope(SymbolType symbolType)
+        {
+            // create nested scope and add input variable
+            this.currentScope = new Scope(this.currentScope);
+            AddVariable("x", symbolType);
         }
 
         private void AddVariable(string name, SymbolType type)
