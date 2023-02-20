@@ -16,7 +16,7 @@ namespace CodeProcessor.Grammar
 
         public override object VisitStatement([NotNull] DbgGrammarParser.StatementContext context)
         {
-            ctlr.AddVariableFromAssignment(context);
+            ctlr.AddVerifyVariableFromAssignment(context);
             return base.VisitStatement(context);
         }
 

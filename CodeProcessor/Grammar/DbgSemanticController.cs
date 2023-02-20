@@ -77,15 +77,20 @@ namespace CodeProcessor.Grammar
             this.currentScope = this.currentScope.Parent;
         }
 
-        public void AddVariableFromAssignment(DbgGrammarParser.StatementContext context)
+        public void AddVerifyVariableFromAssignment(DbgGrammarParser.StatementContext context)
         {
             // add variable if assignment
             var assignment = context.assignment();
             if (assignment != null)
             {
                 var varName = assignment.varName.Text;
-                var varType = GetAssigneeType(context);
-                AddVariable(varName, varType);
+                var varType = GetAssignorType(context);
+                if (varType == SymbolType.VOID)
+                {
+                    Console.WriteLine($"Error at 51: cannot create assign a command without return value to a variable");
+                    varType = null;
+                }
+                AddVerifyVariable(varName, varType);
             }
         }
 
@@ -190,11 +195,11 @@ namespace CodeProcessor.Grammar
         {
             // create nested scope and add input variable
             this.currentScope = new Scope(this.currentScope);
-            AddVariable("x", symbolType);
+            this.currentScope["x"] = symbolType;
         }
 
 
-        private void AddVariable(string name, SymbolType type)
+        private void AddVerifyVariable(string name, SymbolType type)
         {
             try
             {
@@ -262,7 +267,7 @@ namespace CodeProcessor.Grammar
             return SymbolType.CARDPREDICATE;
         }
 
-        private SymbolType GetAssigneeType(DbgGrammarParser.StatementContext context)
+        private SymbolType GetAssignorType(DbgGrammarParser.StatementContext context)
         {
             var command = context.command();
             if (command != null)
