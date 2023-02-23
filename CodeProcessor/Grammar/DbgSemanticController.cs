@@ -77,13 +77,13 @@ namespace CodeProcessor.Grammar
             this.currentScope = this.currentScope.Parent;
         }
 
-        public void AddVerifyVariableFromAssignment(DbgGrammarParser.StatementContext context)
+        public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.StatementContext context)
         {
             // add variable if assignment
-            var assignment = context.assignment();
-            if (assignment != null)
+            var varDefinition = context.varDefinition());
+            if (varDefinition != null)
             {
-                var varName = assignment.varName.Text;
+                var varName = varDefinition.varName.Text;
                 var varType = GetAssignorType(context);
                 if (varType == SymbolType.VOID)
                 {

@@ -2,15 +2,15 @@ grammar DbgGrammar;
 @parser::header {#pragma warning disable 3021}
 @lexer::header {#pragma warning disable 3021}
 
-program: definitionStatementList;
+program: definitionStatementList EOF;
 statementList: NL? (statement (NL statement)*)? NL?;
 definitionStatementList: NL? ((commandDefinition | statement) (NL (commandDefinition | statement))*)? NL?;
 
-statement: assignment? (command | expression);
+statement: varDefinition? (command | expression);
 
 commandDefinition: LPAREN commandDeclaration RPAREN COLON block;
 
-assignment: (varName=ID) COLON;
+varDefinition: (varName=ID) COLON;
 command: CW (CW | expression)*;
 commandDeclaration: CW (CW | argumentDeclaration)*;
 argumentDeclaration: LPAREN name=ID COLON typeDefinition RPAREN;
