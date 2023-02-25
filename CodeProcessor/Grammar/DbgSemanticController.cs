@@ -79,8 +79,8 @@ namespace CodeProcessor.Grammar
 
         public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.StatementContext context)
         {
-            // add variable if assignment
-            var varDefinition = context.varDefinition());
+            // add variable if variable definition
+            var varDefinition = context.varDefinition();
             if (varDefinition != null)
             {
                 var varName = varDefinition.varName.Text;
@@ -91,6 +91,21 @@ namespace CodeProcessor.Grammar
                     varType = null;
                 }
                 AddVerifyVariable(varName, varType);
+            }
+        }
+
+        public void VerifyAssignment(DbgGrammarParser.StatementContext context)
+        {
+            // check validity if assignment
+            var assignment = context.assignment();
+            if (assignment != null)
+            {
+                var assigneeType = GetVariableType(assignment.varRef());
+                var assignorType = GetAssignorType(context);
+                if (assigneeType != assignorType)
+                {
+                    Console.WriteLine($"Error at 52: types in assignment ({assigneeType} and {assignorType}) do not match");
+                }
             }
         }
 

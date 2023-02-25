@@ -70,6 +70,12 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitVarDefinition([NotNull] DbgGrammarParser.VarDefinitionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.assignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAssignment([NotNull] DbgGrammarParser.AssignmentContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="DbgGrammarParser.command"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

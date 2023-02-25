@@ -6,11 +6,12 @@ program: definitionStatementList EOF;
 statementList: NL? (statement (NL statement)*)? NL?;
 definitionStatementList: NL? ((commandDefinition | statement) (NL (commandDefinition | statement))*)? NL?;
 
-statement: varDefinition? (command | expression);
+statement: (varDefinition | assignment)? (command | expression);
 
 commandDefinition: LPAREN commandDeclaration RPAREN COLON block;
 
 varDefinition: (varName=ID) COLON;
+assignment: varRef COLONEQ;
 command: CW (CW | expression)*;
 commandDeclaration: CW (CW | argumentDeclaration)*;
 argumentDeclaration: LPAREN name=ID COLON typeDefinition RPAREN;
@@ -62,6 +63,7 @@ NOT: 'NOT';
 HAS: 'HAS';
 NO: 'NO';
 
+COLONEQ: ':=';
 COLON: ':';
 SSUFFIX: '\'s';
 
