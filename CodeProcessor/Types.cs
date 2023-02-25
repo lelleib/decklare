@@ -31,6 +31,7 @@ namespace CodeProcessor
         public static SymbolType NUMBERPREDICATE = new SymbolType(SymbolTypeEnum.NumberPredicate);
         public static SymbolType PILE = new SymbolType(SymbolTypeEnum.Pile);
         public static SymbolType PLAYER = new SymbolType(SymbolTypeEnum.Player);
+        public static SymbolType PLAYERLIST = new SymbolType(SymbolTypeEnum.List, PLAYER);
         public static SymbolType SUPPLY = new SymbolType(SymbolTypeEnum.Supply);
         public static SymbolType VOID = new SymbolType(SymbolTypeEnum.Void);
 
@@ -103,7 +104,7 @@ namespace CodeProcessor
 
         public bool IsConvertibleTo(SymbolType sourceType, SymbolType targetType)
         {
-            if (targetType.MainType == SymbolTypeEnum.List && targetType.SubType == sourceType)
+            if (sourceType == targetType || (targetType.MainType == SymbolTypeEnum.List && targetType.SubType == sourceType))
             {
                 return true;
             }
@@ -142,7 +143,7 @@ namespace CodeProcessor
                         case "Visibility":
                             return GetMemberType(this[new string[] { "ENUM", "VISIBILITY" }], path.Skip(1).ToArray());
                         case "Viewers":
-                            return GetMemberType(this[new string[] { "LIST", "PLAYERS" }], path.Skip(1).ToArray());
+                            return GetMemberType(SymbolType.PLAYERLIST, path.Skip(1).ToArray());
                         default:
                             throw new Exception($"Type 'PILE' does not have member '{path[0]}'");
                     }
