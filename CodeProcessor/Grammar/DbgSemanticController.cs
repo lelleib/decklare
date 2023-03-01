@@ -7,8 +7,36 @@ namespace CodeProcessor.Grammar
 {
     public class DbgSemanticController
     {
-        private readonly (string, CommandSignature)[] builtInCommands =
+        private TypeSystem typeSystem;
+        private Scope currentScope;
+        private CommandRegistry commandRegistry;
+        private List<(string, SymbolType)> nextBlockArguments;
+
+        public DbgSemanticController()
         {
+            (string, SymbolType)[] builtInVars =
+        {
+            ("Hand", SymbolType.PILE),
+            ("Deck", SymbolType.PILE),
+            ("Discard", SymbolType.PILE),
+            ("InPlay", SymbolType.PILE),
+            ("This", SymbolType.PILE),
+            ("CenterPile", SymbolType.PILE),
+            ("Action", SymbolType.NUMBER),
+            ("Buy", SymbolType.NUMBER),
+            ("Coin", SymbolType.NUMBER),
+            ("Victory", SymbolType.NUMBER),
+            ("Discount", SymbolType.NUMBER),
+            ("Me", SymbolType.PLAYER),
+            ("ActivePlayer", SymbolType.PLAYER),
+            ("LeftPlayer", SymbolType.PLAYER),
+            ("RightPlayer", SymbolType.PLAYER),
+            ("AllPlayers", SymbolType.PLAYERLIST),
+            ("AllOtherPlayers", SymbolType.PLAYERLIST)
+        };
+
+            (string, CommandSignature)[] builtInCommands =
+            {
             ("Let1Arrange2", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE}}),
             ("SET (variable: &ENUM<T>) TO (value: ENUM<T>)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
             ("Set1To2", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.NUMBER,SymbolType.NUMBER}}),
@@ -19,39 +47,12 @@ namespace CodeProcessor.Grammar
             ("Detach1FromCard", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
             ("InitDominion", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{}})
         };
-        private readonly ScopeSymbol[] builtInVars =
-        {
-            new ScopeSymbol("Hand", "PILE"),
-            new ScopeSymbol("Deck", "PILE"),
-            new ScopeSymbol("Discard", "PILE"),
-            new ScopeSymbol("InPlay", "PILE"),
-            new ScopeSymbol("This", "PILE"),
-            new ScopeSymbol("CenterPile", "PILE"),
-            new ScopeSymbol("Action", "NUMBER"),
-            new ScopeSymbol("Buy", "NUMBER"),
-            new ScopeSymbol("Coin", "NUMBER"),
-            new ScopeSymbol("Victory", "NUMBER"),
-            new ScopeSymbol("Discount", "NUMBER"),
-            new ScopeSymbol("Me", "PLAYER"),
-            new ScopeSymbol("ActivePlayer", "PLAYER"),
-            new ScopeSymbol("LeftPlayer", "PLAYER"),
-            new ScopeSymbol("RightPlayer", "PLAYER"),
-            new ScopeSymbol("AllPlayers", "LIST<PLAYER>"),
-            new ScopeSymbol("AllOtherPlayers", "LIST<PLAYER>")
-        };
 
-        private TypeSystem typeSystem;
-        private Scope currentScope;
-        private CommandRegistry commandRegistry;
-        private List<(string, SymbolType)> nextBlockArguments;
-
-        public DbgSemanticController()
-        {
             // create default scope and add built-in variables
             this.currentScope = new Scope();
             foreach (var item in builtInVars)
             {
-                this.currentScope[item.Name] = item.Type;
+                this.currentScope[item.Item1] = item.Item2;
             }
             this.commandRegistry = new CommandRegistry();
             foreach (var item in builtInCommands)
@@ -121,9 +122,9 @@ namespace CodeProcessor.Grammar
                 var arguments = context.expression();
                 for (int i = 0; i < arguments.Length; i++)
                 {
-                    var type = GetExpressionType(arguments[i]);
+                    var inputType = GetExpressionType(arguments[i]);
                     var expectedType = signature.Arguments[i];
-                    if (type != expectedType) // TODO type compatibility check
+                    if (typeSystem.IsConvertibleTo(inputType, expectedType))
                     {
                         Console.WriteLine($"Error at 46: The command's {i + 1}. argument have a wrong type ({type} instead of {expectedType})");
                     }
@@ -146,7 +147,7 @@ namespace CodeProcessor.Grammar
             if (varRef != null)
             {
                 var type = GetVariableType(varRef);
-                if (type != null && type != SymbolType.NUMBER) // TODO type compatibility check
+                if (type != null && typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
                 {
                     Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is not of type NUMBER");
                 }
@@ -159,7 +160,7 @@ namespace CodeProcessor.Grammar
             if (varRef != null)
             {
                 var type = GetVariableType(varRef);
-                if (type != null && type != SymbolType.BOOLEAN) // TODO type compatibility check
+                if (type != null && typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
                 {
                     Console.WriteLine($"Error at 49: variable '{varRef.GetText()}' used in boolean expression but is not of type BOOLEAN");
                 }
@@ -176,13 +177,13 @@ namespace CodeProcessor.Grammar
             var varRefs = context.varRef();
             var firstOperandType = GetVariableType(varRefs[0]);
             var secondOperandType = GetVariableType(varRefs[1]);
-            if (firstOperandType != SymbolType.LIST)
+            if (firstOperandType.MainType != SymbolTypeEnum.List)
             {
-                Console.WriteLine($"Error at 50: {ex.Message}");
+                Console.WriteLine($"Error at 53: 'HAS' expressions must have a list as their first operand");
             }
-            if (secondOperandType != firstOperandType.SubType) // TODO fix type system representation
+            if (secondOperandType != firstOperandType.SubType)
             {
-                Console.WriteLine($"Error at 50: {ex.Message}");
+                Console.WriteLine($"Error at 54: The second operand's type in 'HAS' expression does not match the item type of the list");
             }
         }
 
@@ -231,13 +232,13 @@ namespace CodeProcessor.Grammar
             string varName = context.ID().First().Symbol.Text;
             string[] memberPath = context.ID().Skip(1).Select(id => id.Symbol.Text).ToArray();
             var type = this.currentScope[varName];
-            if (type == null || memberPath == null) // TODO memberPath==null === no members?
+            if (type == null)
             {
-                return type;
+                return null;
             }
             else
             {
-                return type.GetMemberType(memberPath);
+                return typeSystem.GetMemberType(type, memberPath);
             }
         }
 
@@ -297,7 +298,7 @@ namespace CodeProcessor.Grammar
 
         private SymbolType GetVerifyTypeDefinition(DbgGrammarParser.TypeDefinitionContext context)
         {
-            var type = new SymbolType(context.mainType.Text, context.subType?.Text);
+            var type = typeSystem[context.mainType.Text, context.subType?.Text]; // TODO fix grammar of subtypes
             if (type == null)
             {
                 Console.WriteLine($"Error at 47: Type {context.GetText()} does not exist");
