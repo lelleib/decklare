@@ -298,7 +298,8 @@ namespace CodeProcessor.Grammar
 
         private SymbolType GetVerifyTypeDefinition(DbgGrammarParser.TypeDefinitionContext context)
         {
-            var type = typeSystem[context.mainType.Text, context.subType?.Text]; // TODO fix grammar of subtypes
+            var typeChain = TDContextToTypeChain(context);
+            var type = typeSystem[typeChain];
             if (type == null)
             {
                 Console.WriteLine($"Error at 47: Type {context.GetText()} does not exist");
@@ -325,6 +326,25 @@ namespace CodeProcessor.Grammar
                 result.Append(ToTitle(cws[i].Symbol.Text));
             }
             return result.ToString();
+        }
+
+        private string[] TDContextToTypeChain(DbgGrammarParser.TypeDefinitionContext context)
+        {
+            return TDContextToTypeChain(context, new List<string>());
+        }
+        
+        private string[] TDContextToTypeChain(DbgGrammarParser.TypeDefinitionContext context, List<string> acc)
+        {
+            acc.Add(context.mainType.Text);
+
+            if (context.subType == null)
+            {
+                return acc.ToArray();
+            }
+            else
+            {
+                return TDContextToTypeChain(context.subType, acc);
+            }
         }
     }
 }

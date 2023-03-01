@@ -15,7 +15,7 @@ assignment: varRef COLONEQ;
 command: CW (CW | expression)*;
 commandDeclaration: CW (CW | argumentDeclaration)*;
 argumentDeclaration: LPAREN name=ID COLON typeDefinition RPAREN;
-typeDefinition: ref=AND? mainType=CW (LT subType=CW GT)?;
+typeDefinition: mainType=CW (LT subType=typeDefinition GT)?;
 
 expression: varRef | block | numericExpression | booleanExpression | numberPredicate | cardPredicate;
 block: LCURLY statementList RCURLY;
