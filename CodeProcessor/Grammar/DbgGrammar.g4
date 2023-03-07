@@ -17,7 +17,7 @@ commandDeclaration: CW (CW | argumentDeclaration)*;
 argumentDeclaration: LPAREN name=ID COLON typeDefinition RPAREN;
 typeDefinition: mainType=CW (LT subType=typeDefinition GT)?;
 
-expression: varRef | block | numericExpression | booleanExpression | numberPredicate | cardPredicate;
+expression: varRef | block | numericExpression | booleanExpression | numberPredicate | cardPredicate | enumLiteral;
 block: LCURLY statementList RCURLY;
 //varRef: ID varRef2;
 //varRef2: (SSUFFIX varRef varRef2)?;
@@ -41,6 +41,8 @@ listHasExpression: varRef HAS NO? varRef;
 
 numberPredicate: LT booleanExpression GT;
 cardPredicate: LBRACKET booleanExpression RBRACKET;
+
+enumLiteral: CW COLON CW;
 
 PLUS: '+';
 MINUS: '-';

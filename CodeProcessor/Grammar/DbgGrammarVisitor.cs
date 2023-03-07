@@ -159,5 +159,11 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitCardPredicate([NotNull] DbgGrammarParser.CardPredicateContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.enumLiteral"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEnumLiteral([NotNull] DbgGrammarParser.EnumLiteralContext context);
 }
 } // namespace CodeProcessor.Grammar
