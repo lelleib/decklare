@@ -42,7 +42,7 @@ listHasExpression: varRef HAS NO? varRef;
 numberPredicate: LT booleanExpression GT;
 cardPredicate: LBRACKET booleanExpression RBRACKET;
 
-enumLiteral: CW COLON CW;
+enumLiteral: variant=CW COLON enumType=CW;
 
 PLUS: '+';
 MINUS: '-';

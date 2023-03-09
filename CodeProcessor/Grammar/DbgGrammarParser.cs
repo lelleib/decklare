@@ -1637,11 +1637,13 @@ public partial class DbgGrammarParser : Parser {
 	}
 
 	public partial class EnumLiteralContext : ParserRuleContext {
+		public IToken variant;
+		public IToken enumType;
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode COLON() { return GetToken(DbgGrammarParser.COLON, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] CW() { return GetTokens(DbgGrammarParser.CW); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CW(int i) {
 			return GetToken(DbgGrammarParser.CW, i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode COLON() { return GetToken(DbgGrammarParser.COLON, 0); }
 		public EnumLiteralContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -1663,11 +1665,11 @@ public partial class DbgGrammarParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			State = 227;
-			Match(CW);
+			_localctx.variant = Match(CW);
 			State = 228;
 			Match(COLON);
 			State = 229;
-			Match(CW);
+			_localctx.enumType = Match(CW);
 			}
 		}
 		catch (RecognitionException re) {
