@@ -126,7 +126,7 @@ namespace CodeProcessor.Grammar
                     var expectedType = signature.Arguments[i];
                     if (typeSystem.IsConvertibleTo(inputType, expectedType))
                     {
-                        Console.WriteLine($"Error at 46: The command's {i + 1}. argument have a wrong type ({type} instead of {expectedType})");
+                        Console.WriteLine($"Error at 46: The command's {i + 1}. argument have a wrong type ({inputType} instead of {expectedType})");
                     }
                 }
             }
