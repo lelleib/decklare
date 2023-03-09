@@ -214,6 +214,21 @@ namespace CodeProcessor.Grammar
             this.currentScope["x"] = symbolType;
         }
 
+        public void VerifyEnumLiteral(DbgGrammarParser.EnumLiteralContext context)
+        {
+            var enumType = context.enumType.Text;
+            var variant = context.variant.Text;
+
+            try
+            {
+                typeSystem.AssertEnumLiteralValidity(enumType, variant);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error at 53: {ex.Message}");
+            }
+        }
+
 
         private void AddVerifyVariable(string name, SymbolType type)
         {
@@ -280,7 +295,17 @@ namespace CodeProcessor.Grammar
             {
                 return SymbolType.NUMBERPREDICATE;
             }
-            return SymbolType.CARDPREDICATE;
+            var cardPredicate = context.cardPredicate();
+            if (cardPredicate != null)
+            {
+                return SymbolType.CARDPREDICATE;
+            }
+            var enumLiteral = context.enumLiteral();
+            if (enumLiteral != null)
+            {
+                return GetEnumLiteralType(enumLiteral);
+            }
+            return null;
         }
 
         private SymbolType GetAssignorType(DbgGrammarParser.StatementContext context)
@@ -344,6 +369,19 @@ namespace CodeProcessor.Grammar
             else
             {
                 return TDContextToTypeChain(context.subType, acc);
+            }
+        }
+
+        private SymbolType GetEnumLiteralType(DbgGrammarParser.EnumLiteralContext context)
+        {
+            var enumType = context.enumType.Text;
+            try
+            {
+                return typeSystem[new string[]{"ENUM", enumType}];
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

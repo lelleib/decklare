@@ -114,7 +114,7 @@ namespace CodeProcessor
             }
         }
 
-        public virtual SymbolType GetMemberType(SymbolType rootType, string[] path)
+        public SymbolType GetMemberType(SymbolType rootType, string[] path)
         {
             if (path.Length == 0)
             {
@@ -149,6 +149,18 @@ namespace CodeProcessor
                     }
                 default:
                     throw new Exception($"Type '{rootType}' does not have any members");
+            }
+        }
+
+        public void AssertEnumLiteralValidity(string enumType, string variant)
+        {
+            if (!enumDefinitions.ContainsKey(enumType))
+            {
+                throw new Exception($"Enum type '{enumType}' does not exist");
+            }
+            if (!enumDefinitions[enumType].Contains(variant))
+            {
+                throw new Exception($"Enum type '{enumType}' does not have a variant of '{variant}'");
             }
         }
     }

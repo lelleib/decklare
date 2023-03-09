@@ -77,5 +77,11 @@ namespace CodeProcessor.Grammar
             ctlr.PopScope();
             return result;
         }
+
+        public override object VisitEnumLiteral([NotNull] DbgGrammarParser.EnumLiteralContext context)
+        {
+            ctlr.VerifyEnumLiteral(context);
+            return base.VisitEnumLiteral(context);
+        }
     }
 }
