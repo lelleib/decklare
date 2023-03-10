@@ -197,6 +197,13 @@ namespace CodeProcessor.Grammar
 
             nextBlockArguments.AddRange(argumentNames.Zip(arguments));
 
+            var nextBlockArgumentsDistinct = nextBlockArguments.GroupBy(x => x.Item1).Select(x => x.First()).ToList();
+            if (nextBlockArguments.Count > nextBlockArgumentsDistinct.Count)
+            {
+                Console.WriteLine($"Error at 57: There are multiple arguments with the same name in command declaration");
+                nextBlockArguments = nextBlockArgumentsDistinct;
+            }
+
             try
             {
                 this.commandRegistry[commandId] = signature;
