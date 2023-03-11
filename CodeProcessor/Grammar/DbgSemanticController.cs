@@ -88,7 +88,7 @@ namespace CodeProcessor.Grammar
                 var varType = GetAssignorType(context);
                 if (varType == SymbolType.VOID)
                 {
-                    Console.WriteLine($"Error at 51: cannot create assign a command without return value to a variable");
+                    Console.WriteLine($"Error at 51: cannot assign a command without return value to a variable");
                     varType = null;
                 }
                 AddVerifyVariable(varName, varType);
@@ -169,7 +169,17 @@ namespace CodeProcessor.Grammar
 
         public void VerifyEnumIsExpression(DbgGrammarParser.EnumIsExpressionContext context)
         {
-            var varRefs = context.varRef(); // TODO implement enum literal syntax
+            var varRefs = context.varRef();
+            var firstOperandType = GetVariableType(varRefs[0]);
+            var secondOperandType = GetVariableType(varRefs[1]);
+            if (firstOperandType.MainType != SymbolTypeEnum.Enum || secondOperandType.MainType != SymbolTypeEnum.Enum)
+            {
+                Console.WriteLine($"Error at 58: 'IS' expressions must have enums as their operands");
+            }
+            else if (!typeSystem.IsConvertibleTo(secondOperandType, firstOperandType))
+            {
+                Console.WriteLine($"Error at 59: Enum types of operands in 'IS' expression do not match");
+            }
         }
 
         public void VerifyListHasExpression(DbgGrammarParser.ListHasExpressionContext context)
