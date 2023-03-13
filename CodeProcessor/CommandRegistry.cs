@@ -17,12 +17,14 @@ namespace CodeProcessor
         {
             get
             {
-                return this.commandTable.GetValueOrDefault(name, null);
+                if (!this.commandTable.ContainsKey(name))
+                    throw new Exception("Command does not exist");
+                return this.commandTable[name];
             }
             set
             {
                 if (this.commandTable.ContainsKey(name))
-                    throw new Exception($"name '{name}' already exists");
+                    throw new Exception("Command already exists");
                 this.commandTable[name] = value;
             }
         }

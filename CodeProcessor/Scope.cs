@@ -3,21 +3,6 @@ using System.Collections.Generic;
 
 namespace CodeProcessor
 {
-    public class ScopeSymbol
-    {
-        public string Name { get; set; }
-        public SymbolType Type { get; set; }
-
-        public ScopeSymbol(string name, string type) {
-            if (!Enum.TryParse(type, true, out SymbolType symbolType))
-            {
-                throw new Exception($"type '{type}' is invalid");
-            }
-            this.Name = name;
-            this.Type = symbolType;
-        }
-    }
-
     public class Scope
     {
         public Scope Parent { get; set; }
@@ -33,12 +18,21 @@ namespace CodeProcessor
         {
             get
             {
-                return this.symbolTable.ContainsKey(name) ? this.symbolTable[name] : Parent?[name];
+                if (this.symbolTable.ContainsKey(name))
+                {
+                    return this.symbolTable[name];
+                }
+                else
+                {
+                    if (Parent == null)
+                        return SymbolType.ERRORTYPE;
+                    return Parent[name];
+                }
             }
             set
             {
                 if (this.symbolTable.ContainsKey(name))
-                    throw new Exception($"name '{name}' is already in scope");
+                    throw new Exception($"Name '{name}' is already in scope");
                 this.symbolTable[name] = value;
             }
         }

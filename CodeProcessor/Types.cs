@@ -17,7 +17,8 @@ namespace CodeProcessor
         Pile,
         Player,
         Supply,
-        Void
+        Void,
+        ErrorType
     }
 
     public class SymbolType
@@ -34,6 +35,7 @@ namespace CodeProcessor
         public static SymbolType PLAYERLIST = new SymbolType(SymbolTypeEnum.List, PLAYER);
         public static SymbolType SUPPLY = new SymbolType(SymbolTypeEnum.Supply);
         public static SymbolType VOID = new SymbolType(SymbolTypeEnum.Void);
+        public static SymbolType ERRORTYPE = new SymbolType(SymbolTypeEnum.ErrorType);
 
 
         public SymbolTypeEnum MainType { get; private set; }
@@ -104,7 +106,7 @@ namespace CodeProcessor
 
         public bool IsConvertibleTo(SymbolType sourceType, SymbolType targetType)
         {
-            if (sourceType == targetType || (targetType.MainType == SymbolTypeEnum.List && targetType.SubType == sourceType))
+            if (sourceType == targetType || (targetType.MainType == SymbolTypeEnum.List && targetType.SubType == sourceType) || (sourceType == SymbolType.ERRORTYPE || targetType == SymbolType.ERRORTYPE))
             {
                 return true;
             }
@@ -116,7 +118,7 @@ namespace CodeProcessor
 
         public SymbolType GetMemberType(SymbolType rootType, string[] path)
         {
-            if (path.Length == 0)
+            if (path.Length == 0 || rootType == SymbolType.ERRORTYPE)
             {
                 return rootType;
             }

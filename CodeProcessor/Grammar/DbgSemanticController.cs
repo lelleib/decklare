@@ -89,7 +89,7 @@ namespace CodeProcessor.Grammar
                 if (varType == SymbolType.VOID)
                 {
                     Console.WriteLine($"Error at 51: cannot assign a command without return value to a variable");
-                    varType = null;
+                    varType = SymbolType.ERRORTYPE;
                 }
                 AddVerifyVariable(varName, varType);
             }
@@ -103,7 +103,7 @@ namespace CodeProcessor.Grammar
             {
                 var assigneeType = GetVariableType(assignment.varRef());
                 var assignorType = GetAssignorType(context);
-                if (assigneeType != assignorType)
+                if (!typeSystem.IsConvertibleTo(assignorType, assigneeType))
                 {
                     Console.WriteLine($"Error at 52: types in assignment ({assigneeType} and {assignorType}) do not match");
                 }
@@ -112,13 +112,9 @@ namespace CodeProcessor.Grammar
 
         public void VerifyCommand(DbgGrammarParser.CommandContext context)
         {
-            var signature = GetCommandSignature(context);
-            if (signature == null)
+            try
             {
-                Console.WriteLine($"Error at 45: command does not exist");
-            }
-            else
-            {
+                var signature = GetCommandSignature(context);
                 var arguments = context.expression();
                 for (int i = 0; i < arguments.Length; i++)
                 {
@@ -130,12 +126,16 @@ namespace CodeProcessor.Grammar
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error at 45: {ex.Message}");
+            }
         }
 
         public void VerifyVarRef(DbgGrammarParser.VarRefContext context)
         {
             var type = GetVariableType(context);
-            if (type == null)
+            if (type == SymbolType.ERRORTYPE)
             {
                 Console.WriteLine($"Error at 43: variable '{context.GetText()}' does not exist");
             }
@@ -147,9 +147,9 @@ namespace CodeProcessor.Grammar
             if (varRef != null)
             {
                 var type = GetVariableType(varRef);
-                if (type != null && typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
+                if (typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
                 {
-                    Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is not of type NUMBER");
+                    Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is of type '{type}'");
                 }
             }
         }
@@ -160,9 +160,9 @@ namespace CodeProcessor.Grammar
             if (varRef != null)
             {
                 var type = GetVariableType(varRef);
-                if (type != null && typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
+                if (typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
                 {
-                    Console.WriteLine($"Error at 49: variable '{varRef.GetText()}' used in boolean expression but is not of type BOOLEAN");
+                    Console.WriteLine($"Error at 49: variable '{varRef.GetText()}' used in boolean expression but is of type '{type}'");
                 }
             }
         }
@@ -191,7 +191,7 @@ namespace CodeProcessor.Grammar
             {
                 Console.WriteLine($"Error at 53: 'HAS' expressions must have a list as their first operand");
             }
-            if (secondOperandType != firstOperandType.SubType)
+            if (typeSystem.IsConvertibleTo(secondOperandType, firstOperandType.SubType))
             {
                 Console.WriteLine($"Error at 54: The second operand's type in 'HAS' expression does not match the item type of the list");
             }
@@ -264,14 +264,7 @@ namespace CodeProcessor.Grammar
             string varName = context.ID().First().Symbol.Text;
             string[] memberPath = context.ID().Skip(1).Select(id => id.Symbol.Text).ToArray();
             var type = this.currentScope[varName];
-            if (type == null)
-            {
-                return null;
-            }
-            else
-            {
-                return typeSystem.GetMemberType(type, memberPath);
-            }
+            return typeSystem.GetMemberType(type, memberPath);
         }
 
         private CommandSignature GetCommandSignature(DbgGrammarParser.CommandContext context)
@@ -282,7 +275,14 @@ namespace CodeProcessor.Grammar
 
         private SymbolType GetCommandType(DbgGrammarParser.CommandContext context)
         {
-            return GetCommandSignature(context)?.CommandType;
+            try
+            {
+                return GetCommandSignature(context).CommandType;
+            }
+            catch (Exception)
+            {
+                return SymbolType.ERRORTYPE;
+            }
         }
 
         private SymbolType GetExpressionType(DbgGrammarParser.ExpressionContext context)
@@ -322,7 +322,7 @@ namespace CodeProcessor.Grammar
             {
                 return GetEnumLiteralType(enumLiteral);
             }
-            return null;
+            return SymbolType.ERRORTYPE;
         }
 
         private SymbolType GetAssignorType(DbgGrammarParser.StatementContext context)
@@ -341,12 +341,15 @@ namespace CodeProcessor.Grammar
         private SymbolType GetVerifyTypeDefinition(DbgGrammarParser.TypeDefinitionContext context)
         {
             var typeChain = TDContextToTypeChain(context);
-            var type = typeSystem[typeChain];
-            if (type == null)
+            try
             {
-                Console.WriteLine($"Error at 47: Type {context.GetText()} does not exist");
+                return typeSystem[typeChain];
             }
-            return type;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error at 47: Type {context.GetText()} does not exist: {ex.Message}");
+                return SymbolType.ERRORTYPE;
+            }
         }
 
         private string ToTitle(string text)
@@ -398,7 +401,7 @@ namespace CodeProcessor.Grammar
             }
             catch (Exception)
             {
-                return null;
+                return SymbolType.ERRORTYPE;
             }
         }
     }
