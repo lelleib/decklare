@@ -88,7 +88,7 @@ namespace CodeProcessor.Grammar
                 var varType = GetAssignorType(context);
                 if (varType == SymbolType.VOID)
                 {
-                    Console.WriteLine($"Error at 51: cannot assign a command without return value to a variable");
+                    SignalError("Cannot assign a command without return value to a variable", context);
                     varType = SymbolType.ERRORTYPE;
                 }
                 AddVerifyVariable(varName, varType);
@@ -105,7 +105,7 @@ namespace CodeProcessor.Grammar
                 var assignorType = GetAssignorType(context);
                 if (!typeSystem.IsConvertibleTo(assignorType, assigneeType))
                 {
-                    Console.WriteLine($"Error at 52: types in assignment ({assigneeType} and {assignorType}) do not match");
+                    SignalError($"Types in assignment ('{assigneeType}' and '{assignorType}') do not match", context);
                 }
             }
         }
@@ -120,15 +120,15 @@ namespace CodeProcessor.Grammar
                 {
                     var inputType = GetExpressionType(arguments[i]);
                     var expectedType = signature.Arguments[i];
-                    if (typeSystem.IsConvertibleTo(inputType, expectedType))
+                    if (!typeSystem.IsConvertibleTo(inputType, expectedType))
                     {
-                        Console.WriteLine($"Error at 46: The command's {i + 1}. argument have a wrong type ({inputType} instead of {expectedType})");
+                        SignalError($"The command's {i + 1}. argument have a wrong type ('{inputType}' but '{expectedType}' is expected)", context);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error at 45: {ex.Message}");
+                SignalError($"{ex.Message}", context);
             }
         }
 
@@ -137,7 +137,7 @@ namespace CodeProcessor.Grammar
             var type = GetVariableType(context);
             if (type == SymbolType.ERRORTYPE)
             {
-                Console.WriteLine($"Error at 43: variable '{context.GetText()}' does not exist");
+                SignalError($"Variable '{context.GetText()}' does not exist", context);
             }
         }
 
@@ -149,7 +149,7 @@ namespace CodeProcessor.Grammar
                 var type = GetVariableType(varRef);
                 if (typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
                 {
-                    Console.WriteLine($"Error at 48: variable '{varRef.GetText()}' used in numeric expression but is of type '{type}'");
+                    SignalError($"Variable '{varRef.GetText()}' used in numeric expression but is of type '{type}'", context);
                 }
             }
         }
@@ -162,7 +162,7 @@ namespace CodeProcessor.Grammar
                 var type = GetVariableType(varRef);
                 if (typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
                 {
-                    Console.WriteLine($"Error at 49: variable '{varRef.GetText()}' used in boolean expression but is of type '{type}'");
+                    SignalError($"Variable '{varRef.GetText()}' used in boolean expression but is of type '{type}'", context);
                 }
             }
         }
@@ -174,11 +174,11 @@ namespace CodeProcessor.Grammar
             var secondOperandType = GetVariableType(varRefs[1]);
             if (firstOperandType.MainType != SymbolTypeEnum.Enum || secondOperandType.MainType != SymbolTypeEnum.Enum)
             {
-                Console.WriteLine($"Error at 58: 'IS' expressions must have enums as their operands");
+                SignalError("'IS' expressions must have enums as their operands", context);
             }
             else if (!typeSystem.IsConvertibleTo(secondOperandType, firstOperandType))
             {
-                Console.WriteLine($"Error at 59: Enum types of operands in 'IS' expression do not match");
+                SignalError("Enum types of operands in 'IS' expression do not match", context);
             }
         }
 
@@ -189,11 +189,11 @@ namespace CodeProcessor.Grammar
             var secondOperandType = GetVariableType(varRefs[1]);
             if (firstOperandType.MainType != SymbolTypeEnum.List)
             {
-                Console.WriteLine($"Error at 53: 'HAS' expressions must have a list as their first operand");
+                SignalError("'HAS' expressions must have a list as their first operand", context);
             }
             if (typeSystem.IsConvertibleTo(secondOperandType, firstOperandType.SubType))
             {
-                Console.WriteLine($"Error at 54: The second operand's type in 'HAS' expression does not match the item type of the list");
+                SignalError("The second operand's type in 'HAS' expression does not match the item type of the list", context);
             }
         }
 
@@ -210,7 +210,7 @@ namespace CodeProcessor.Grammar
             var nextBlockArgumentsDistinct = nextBlockArguments.GroupBy(x => x.Item1).Select(x => x.First()).ToList();
             if (nextBlockArguments.Count > nextBlockArgumentsDistinct.Count)
             {
-                Console.WriteLine($"Error at 57: There are multiple arguments with the same name in command declaration");
+                SignalError("There are multiple arguments with the same name in command declaration", context);
                 nextBlockArguments = nextBlockArgumentsDistinct;
             }
 
@@ -220,7 +220,7 @@ namespace CodeProcessor.Grammar
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error at 44: {ex.Message}");
+                SignalError($"{ex.Message}", context);
             }
         }
 
@@ -242,7 +242,7 @@ namespace CodeProcessor.Grammar
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error at 53: {ex.Message}");
+                SignalError($"{ex.Message}", context);
             }
         }
 
@@ -255,7 +255,7 @@ namespace CodeProcessor.Grammar
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error at 42: {ex.Message}");
+                SignalError($"{ex.Message}", context);
             }
         }
 
@@ -347,7 +347,7 @@ namespace CodeProcessor.Grammar
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error at 47: Type {context.GetText()} does not exist: {ex.Message}");
+                SignalError($"Type {context.GetText()} does not exist: {ex.Message}", context);
                 return SymbolType.ERRORTYPE;
             }
         }
@@ -403,6 +403,11 @@ namespace CodeProcessor.Grammar
             {
                 return SymbolType.ERRORTYPE;
             }
+        }
+
+        private void SignalError(string message, Antlr4.Runtime.ParserRuleContext context)
+        {
+            Console.WriteLine($"Error at line {context.Start.Line}: {message}");
         }
     }
 }
