@@ -7,6 +7,12 @@ namespace CodeProcessor
     {
         public SymbolType CommandType {get; set;}
         public SymbolType[] Arguments {get; set;}
+
+        public CommandSignature(SymbolType commandType, SymbolType[] arguments)
+        {
+            CommandType = commandType;
+            Arguments = arguments;
+        }
     }
 
     public class CommandRegistry

@@ -5,10 +5,10 @@ namespace CodeProcessor
 {
     public class Scope
     {
-        public Scope Parent { get; set; }
+        public Scope? Parent { get; set; }
         private Dictionary<string, SymbolType> symbolTable;
 
-        public Scope(Scope parent = null)
+        public Scope(Scope? parent = null)
         {
             this.symbolTable = new Dictionary<string, SymbolType>();
             this.Parent = parent;

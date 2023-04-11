@@ -39,10 +39,10 @@ namespace CodeProcessor
 
 
         public SymbolTypeEnum MainType { get; private set; }
-        public SymbolType SubType { get; private set; }
-        public string EnumSubType { get; private set; }
+        public SymbolType? SubType { get; private set; }
+        public string? EnumSubType { get; private set; }
 
-        public SymbolType(SymbolTypeEnum mainType, SymbolType subType = null, string enumSubType = null)
+        public SymbolType(SymbolTypeEnum mainType, SymbolType? subType = null, string? enumSubType = null)
         {
             this.MainType = mainType;
             this.SubType = subType;

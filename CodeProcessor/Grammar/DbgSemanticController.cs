@@ -37,15 +37,15 @@ namespace CodeProcessor.Grammar
 
             (string, CommandSignature)[] builtInCommands =
             {
-            ("Let1Arrange2", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE}}),
-            ("SET (variable: &ENUM<T>) TO (value: ENUM<T>)", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.CARD}}),
-            ("Set1To2", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.NUMBER,SymbolType.NUMBER}}),
-            ("Shuffle1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PILE}}),
-            ("Rotate1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.PILE}}),
-            ("Execute1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
-            ("Clone1", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
-            ("Detach1FromCard", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{SymbolType.EFFECT}}),
-            ("InitDominion", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{}})
+            ("Let1Arrange2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
+            ("SET (variable: &ENUM<T>) TO (value: ENUM<T>)", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.CARD})),
+            ("Set1To2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.NUMBER,SymbolType.NUMBER})),
+            ("Shuffle1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
+            ("Rotate1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
+            ("Execute1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+            ("Clone1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+            ("Detach1FromCard", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+            ("InitDominion", new CommandSignature(SymbolType.VOID, new SymbolType[]{}))
         };
 
             typeSystem = new TypeSystem();
@@ -77,7 +77,7 @@ namespace CodeProcessor.Grammar
 
         public void PopScope()
         {
-            this.currentScope = this.currentScope.Parent;
+            this.currentScope = this.currentScope.Parent ?? this.currentScope;
         }
 
         public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.StatementContext context)
@@ -201,7 +201,7 @@ namespace CodeProcessor.Grammar
             {
                 SignalError("'HAS' expressions must have a list as their first operand", context);
             }
-            if (typeSystem.IsConvertibleTo(secondOperandType, firstOperandType.SubType))
+            if (typeSystem.IsConvertibleTo(secondOperandType, firstOperandType.SubType!))
             {
                 SignalError("The second operand's type in 'HAS' expression does not match the item type of the list", context);
             }
@@ -213,7 +213,7 @@ namespace CodeProcessor.Grammar
 
             var argumentNames = context.argumentDeclaration().Select(ctx => ctx.name.Text).ToArray();
             var arguments = context.argumentDeclaration().Select(ctx => GetVerifyTypeDefinition(ctx.typeDefinition())).ToArray();
-            var signature = new CommandSignature { CommandType = SymbolType.VOID, Arguments = arguments };
+            var signature = new CommandSignature(SymbolType.VOID, arguments);
 
             nextBlockArguments.AddRange(argumentNames.Zip(arguments));
 
