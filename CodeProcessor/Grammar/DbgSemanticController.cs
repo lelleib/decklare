@@ -48,6 +48,8 @@ namespace CodeProcessor.Grammar
             ("InitDominion", new CommandSignature{CommandType = SymbolType.VOID, Arguments = new SymbolType[]{}})
         };
 
+            typeSystem = new TypeSystem();
+
             // create default scope and add built-in variables
             this.currentScope = new Scope();
             foreach (var item in builtInVars)
