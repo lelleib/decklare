@@ -91,7 +91,15 @@ namespace CodeProcessor.Grammar
                     SignalError("Cannot assign a command without return value to a variable", context);
                     varType = SymbolType.ERRORTYPE;
                 }
-                AddVerifyVariable(varName, varType);
+
+                try
+                {
+                    this.currentScope[varName] = varType;
+                }
+                catch (Exception ex)
+                {
+                    SignalError($"{ex.Message}", context);
+                }
             }
         }
 
@@ -246,19 +254,6 @@ namespace CodeProcessor.Grammar
             }
         }
 
-
-        private void AddVerifyVariable(string name, SymbolType type)
-        {
-            try
-            {
-                this.currentScope[name] = type;
-            }
-            catch (Exception ex)
-            {
-                SignalError($"{ex.Message}", context);
-            }
-        }
-
         private SymbolType GetVariableType(DbgGrammarParser.VarRefContext context)
         {
             string varName = context.ID().First().Symbol.Text;
@@ -377,7 +372,7 @@ namespace CodeProcessor.Grammar
         {
             return TDContextToTypeChain(context, new List<string>());
         }
-        
+
         private string[] TDContextToTypeChain(DbgGrammarParser.TypeDefinitionContext context, List<string> acc)
         {
             acc.Add(context.mainType.Text);
@@ -397,7 +392,7 @@ namespace CodeProcessor.Grammar
             var enumType = context.enumType.Text;
             try
             {
-                return typeSystem[new string[]{"ENUM", enumType}];
+                return typeSystem[new string[] { "ENUM", enumType }];
             }
             catch (Exception)
             {
