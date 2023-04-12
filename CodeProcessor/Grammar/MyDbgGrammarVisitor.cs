@@ -26,12 +26,6 @@ namespace CodeProcessor.Grammar
             return base.VisitCommandDeclaration(context);
         }
 
-        public override object VisitTypeDefinition([NotNull] DbgGrammarParser.TypeDefinitionContext context)
-        {
-            // TODO verify
-            return base.VisitTypeDefinition(context);
-        }
-
         public override object VisitCommand([NotNull] DbgGrammarParser.CommandContext context)
         {
             ctlr.VerifyCommand(context);
