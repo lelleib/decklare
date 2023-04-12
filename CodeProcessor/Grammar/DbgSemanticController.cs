@@ -15,38 +15,36 @@ namespace CodeProcessor.Grammar
         public DbgSemanticController()
         {
             (string, SymbolType)[] builtInVars =
-        {
-            ("Hand", SymbolType.PILE),
-            ("Deck", SymbolType.PILE),
-            ("Discard", SymbolType.PILE),
-            ("InPlay", SymbolType.PILE),
-            ("This", SymbolType.PILE),
-            ("CenterPile", SymbolType.PILE),
-            ("Action", SymbolType.NUMBER),
-            ("Buy", SymbolType.NUMBER),
-            ("Coin", SymbolType.NUMBER),
-            ("Victory", SymbolType.NUMBER),
-            ("Discount", SymbolType.NUMBER),
-            ("Me", SymbolType.PLAYER),
-            ("ActivePlayer", SymbolType.PLAYER),
-            ("LeftPlayer", SymbolType.PLAYER),
-            ("RightPlayer", SymbolType.PLAYER),
-            ("AllPlayers", SymbolType.PLAYERLIST),
-            ("AllOtherPlayers", SymbolType.PLAYERLIST)
-        };
+            {
+                ("Hand", SymbolType.PILE),
+                ("Deck", SymbolType.PILE),
+                ("Discard", SymbolType.PILE),
+                ("InPlay", SymbolType.PILE),
+                ("This", SymbolType.PILE),
+                ("CenterPile", SymbolType.PILE),
+                ("Action", SymbolType.NUMBER),
+                ("Buy", SymbolType.NUMBER),
+                ("Coin", SymbolType.NUMBER),
+                ("Victory", SymbolType.NUMBER),
+                ("Discount", SymbolType.NUMBER),
+                ("Me", SymbolType.PLAYER),
+                ("ActivePlayer", SymbolType.PLAYER),
+                ("LeftPlayer", SymbolType.PLAYER),
+                ("RightPlayer", SymbolType.PLAYER),
+                ("AllPlayers", SymbolType.PLAYERLIST),
+                ("AllOtherPlayers", SymbolType.PLAYERLIST)
+            };
 
             (string, CommandSignature)[] builtInCommands =
             {
-            ("Let1Arrange2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
-            ("SET (variable: &ENUM<T>) TO (value: ENUM<T>)", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.CARD})),
-            ("Set1To2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.NUMBER,SymbolType.NUMBER})),
-            ("Shuffle1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
-            ("Rotate1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
-            ("Execute1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
-            ("Clone1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
-            ("Detach1FromCard", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
-            ("InitDominion", new CommandSignature(SymbolType.VOID, new SymbolType[]{}))
-        };
+                ("Let1Arrange2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
+                ("Shuffle1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
+                ("Rotate1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
+                ("Execute1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+                ("Clone1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+                ("Detach1FromCard", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+                ("InitDominion", new CommandSignature(SymbolType.VOID, new SymbolType[]{}))
+            };
 
             typeSystem = new TypeSystem();
 
