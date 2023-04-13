@@ -21,7 +21,7 @@ expression: varRef | block | numericExpression | booleanExpression | numberPredi
 block: LCURLY statementList RCURLY;
 //varRef: ID varRef2;
 //varRef2: (SSUFFIX varRef varRef2)?;
-varRef: ID (SSUFFIX ID)*;
+varRef: varName=(ID | X) (SSUFFIX ID)*;
 //numericExpression: (NUM | varRef) numericExpression2;
 //numericExpression2: (op=(MULT | DIV | PLUS | MINUS) numericExpression numericExpression2)?;
 //booleanExpression: (relationExpression | enumIsExpression) booleanExpression2;
@@ -86,6 +86,7 @@ LIST: 'LIST';*/
 
 NUM: ('0' | [1-9][0-9]*);
 CW: [A-Z][A-Z]+;
-ID: [a-zA-Z][a-zA-Z0-9_]*;
+ID: ([a-z] | [a-zA-Z][a-zA-Z0-9_]+);
+X: 'X';
 NL: ('\n' | '\r')+;
 WS: (' ' | '\t') -> skip;

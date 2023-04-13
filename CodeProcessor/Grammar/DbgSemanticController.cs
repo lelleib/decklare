@@ -236,7 +236,7 @@ namespace CodeProcessor.Grammar
         {
             // create nested scope and add input variable
             this.currentScope = new Scope(this.currentScope);
-            this.currentScope["x"] = symbolType;
+            this.currentScope["X"] = symbolType;
         }
 
         public void VerifyEnumLiteral(DbgGrammarParser.EnumLiteralContext context)
@@ -256,7 +256,7 @@ namespace CodeProcessor.Grammar
 
         private SymbolType GetVariableType(DbgGrammarParser.VarRefContext context)
         {
-            string varName = context.ID().First().Symbol.Text;
+            string varName = context.varName.Text;
             string[] memberPath = context.ID().Skip(1).Select(id => id.Symbol.Text).ToArray();
             var type = this.currentScope[varName];
             return typeSystem.GetMemberType(type, memberPath);
