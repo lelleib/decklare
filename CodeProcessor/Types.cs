@@ -53,8 +53,8 @@ namespace CodeProcessor
     public class TypeSystem
     {
         private Dictionary<string, string[]> enumDefinitions = new Dictionary<string, string[]>{
-            {"CARDTYPES", new string[]{"Action, Attack, Reaction, Treasure, Victory"}},
-            {"VISIBILITY", new string[]{"AllVisible, TopVisible, NoneVisible"}}
+            {"CARDTYPES", new string[]{"ACTION", "ATTACK", "REACTION", "TREASURE", "VICTORY"}},
+            {"VISIBILITY", new string[]{"ALLVISIBLE", "TOPVISIBLE", "NONEVISIBLE"}}
         };
 
         public SymbolType this[string[] typeChain]
