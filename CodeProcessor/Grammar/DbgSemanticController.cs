@@ -37,6 +37,13 @@ namespace CodeProcessor.Grammar
 
             (string, CommandSignature)[] builtInCommands =
             {
+                ("Pop12", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.NUMBER,SymbolType.PILE})),
+                ("Let1Choose23", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.PILE})),
+                ("Let1Choose2Where34", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.CARDPREDICATE,SymbolType.PILE})),
+                ("TakeAll1", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.PILE})),
+                ("TakeAllWhere12", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.CARDPREDICATE,SymbolType.PILE})),
+                ("Put12", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.CARD,SymbolType.PILE})),
+                ("Let1Put2Anywhere3", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
                 ("Let1Arrange2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
                 ("Shuffle1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
                 ("Rotate1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
