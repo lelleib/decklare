@@ -1,0 +1,4 @@
+
+LET (player: PLAYER) CHOOSE A CARD TO GAIN TO (pile: PILE) COSTING UP TO (n: NUMBER){
+    LET user CHOOSE 1 FROM Supply WHERE (x's Cost - Discount <= n) AND PUT IT TO pile
+}
