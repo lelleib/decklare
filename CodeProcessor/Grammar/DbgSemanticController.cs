@@ -12,6 +12,8 @@ namespace CodeProcessor.Grammar
         private CommandRegistry commandRegistry;
         private List<(string, SymbolType)> nextBlockArguments;
 
+        public List<string> Errors { get; } = new List<string>();
+
         public DbgSemanticController()
         {
             (string, SymbolType)[] builtInVars =
@@ -409,7 +411,7 @@ namespace CodeProcessor.Grammar
 
         private void SignalError(string message, Antlr4.Runtime.ParserRuleContext context)
         {
-            Console.WriteLine($"Error at line {context.Start.Line}: {message}");
+            Errors.Add($"Error at line {context.Start.Line}: {message}");
         }
     }
 }
