@@ -18,12 +18,14 @@ namespace CodeProcessor.Grammar
         {
             (string, SymbolType)[] builtInVars =
             {
+                ("Supply", SymbolType.PILE),
+                ("Trash", SymbolType.PILE),
+                ("CenterPile", SymbolType.PILE),
                 ("Hand", SymbolType.PILE),
                 ("Deck", SymbolType.PILE),
                 ("Discard", SymbolType.PILE),
                 ("InPlay", SymbolType.PILE),
                 ("This", SymbolType.PILE),
-                ("CenterPile", SymbolType.PILE),
                 ("Action", SymbolType.NUMBER),
                 ("Buy", SymbolType.NUMBER),
                 ("Coin", SymbolType.NUMBER),
@@ -39,14 +41,15 @@ namespace CodeProcessor.Grammar
 
             (string, CommandSignature)[] builtInCommands =
             {
-                ("Pop12", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.NUMBER,SymbolType.PILE})),
-                ("Let1Choose23", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.PILE})),
-                ("Let1Choose2Where34", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.CARDPREDICATE,SymbolType.PILE})),
-                ("TakeAll1", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.PILE})),
-                ("TakeAllWhere12", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.CARDPREDICATE,SymbolType.PILE})),
-                ("Put12", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.CARD,SymbolType.PILE})),
-                ("Let1Put2Anywhere3", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
-                ("Let1Arrange2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
+                ("1From2And3To4", new CommandSignature(SymbolType.CARD, new SymbolType[]{SymbolType.TAKEEXPRESSION,SymbolType.PILE,SymbolType.PUTEXPRESSION,SymbolType.PILE})),
+                ("Pop12", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.NUMBER,SymbolType.PILE})),
+                ("Let1Choose23", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.PILE})),
+                ("Let1Choose2Where34", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.CARDPREDICATE,SymbolType.PILE})),
+                ("TakeAll1", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PILE})),
+                ("TakeAllWhere12", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.CARDPREDICATE,SymbolType.PILE})),
+                ("Put12", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.CARD,SymbolType.PILE})),
+                ("Let1Put2Anywhere3", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
+                ("Let1Arrange2", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
                 ("Shuffle1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
                 ("Rotate1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
                 ("Execute1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
@@ -154,7 +157,7 @@ namespace CodeProcessor.Grammar
             var type = GetVariableType(context);
             if (type == SymbolType.ERRORTYPE)
             {
-                SignalError($"Variable '{context.GetText()}' does not exist", context);
+                SignalError($"Variable '{context.varName.Text}' does not exist in the current context", context);
             }
         }
 
@@ -164,7 +167,7 @@ namespace CodeProcessor.Grammar
             if (varRef != null)
             {
                 var type = GetVariableType(varRef);
-                if (typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
+                if (!typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
                 {
                     SignalError($"Variable '{varRef.GetText()}' used in numeric expression but is of type '{type}'", context);
                 }
@@ -177,7 +180,7 @@ namespace CodeProcessor.Grammar
             if (varRef != null)
             {
                 var type = GetVariableType(varRef);
-                if (typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
+                if (!typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
                 {
                     SignalError($"Variable '{varRef.GetText()}' used in boolean expression but is of type '{type}'", context);
                 }
@@ -208,7 +211,7 @@ namespace CodeProcessor.Grammar
             {
                 SignalError("'HAS' expressions must have a list as their first operand", context);
             }
-            if (typeSystem.IsConvertibleTo(secondOperandType, firstOperandType.SubType!))
+            if (!typeSystem.IsConvertibleTo(secondOperandType, firstOperandType.SubType!))
             {
                 SignalError("The second operand's type in 'HAS' expression does not match the item type of the list", context);
             }
@@ -216,7 +219,8 @@ namespace CodeProcessor.Grammar
 
         public void AddVerifyCommandDeclaration(DbgGrammarParser.CommandDeclarationContext context)
         {
-            var commandId = GetCommandIdFromCWs(context.CW());
+            var argPositions = Enumerable.Range(0, context.ChildCount).Where(i => context.GetChild(i).GetType() == typeof(DbgGrammarParser.ArgumentDeclarationContext)).ToArray();
+            var commandId = GetCommandIdFromCWs(context.CW(), argPositions);
 
             var argumentNames = context.argumentDeclaration().Select(ctx => ctx.name.Text).ToArray();
             var arguments = context.argumentDeclaration().Select(ctx => GetVerifyTypeDefinition(ctx.typeDefinition())).ToArray();
@@ -263,17 +267,71 @@ namespace CodeProcessor.Grammar
             }
         }
 
+        public void VerifyTakeExpression(DbgGrammarParser.TakeExpressionContext context)
+        {
+            // check if the embedded command has PILE as last parameter and returns PILE
+            CommandSignature takeCommandSignature;
+            try
+            {
+                takeCommandSignature = GetCommandSignature(context.command());
+            }
+            catch (System.Exception)
+            {
+                return;
+            }
+
+            if (takeCommandSignature.Arguments.Last() != SymbolType.PILE)
+            {
+                SignalError($"{SymbolType.TAKEEXPRESSION}s have to contain a commad whose last parameter has got a type of '{SymbolType.PILE}'", context);
+            }
+            if (takeCommandSignature.CommandType != SymbolType.PILE)
+            {
+                SignalError($"{SymbolType.TAKEEXPRESSION}s have to contain a commad that returns value of type '{SymbolType.PILE}'", context);
+            }
+        }
+
+        public void VerifyPutExpression(DbgGrammarParser.PutExpressionContext context)
+        {
+            // check if the embedded command has PILE as last parameter and returns PILE
+            CommandSignature putCommandSignature;
+            try
+            {
+                putCommandSignature = GetCommandSignature(context.command());
+            }
+            catch (System.Exception)
+            {
+                return;
+            }
+
+            if (putCommandSignature.Arguments.Last() != SymbolType.PILE)
+            {
+                SignalError($"{SymbolType.PUTEXPRESSION}s have to contain a commad whose last parameter has got a type of '{SymbolType.PILE}'", context);
+            }
+            if (putCommandSignature.CommandType != SymbolType.PILE)
+            {
+                SignalError($"{SymbolType.PUTEXPRESSION}s have to contain a commad that returns value of type '{SymbolType.PILE}'", context);
+            }
+        }
+
+        public void PushNewPutExpressionScope()
+        {
+            // create nested scope and add input variable
+            this.currentScope = new Scope(this.currentScope);
+            this.currentScope["IT"] = SymbolType.PILE;
+        }
+
         private SymbolType GetVariableType(DbgGrammarParser.VarRefContext context)
         {
             string varName = context.varName.Text;
-            string[] memberPath = context.ID().Skip(1).Select(id => id.Symbol.Text).ToArray();
+            string[] memberPath = context.varMemberPath().ID().Select(id => id.Symbol.Text).ToArray();
             var type = this.currentScope[varName];
             return typeSystem.GetMemberType(type, memberPath);
         }
 
         private CommandSignature GetCommandSignature(DbgGrammarParser.CommandContext context)
         {
-            var commandId = GetCommandIdFromCWs(context.CW());
+            var argPositions = Enumerable.Range(0, context.ChildCount).Where(i => context.GetChild(i).GetType() == typeof(DbgGrammarParser.ExpressionContext)).ToArray();
+            var commandId = GetCommandIdFromCWs(context.CW(), argPositions);
             return this.commandRegistry[commandId];
         }
 
@@ -361,18 +419,25 @@ namespace CodeProcessor.Grammar
             return Char.ToUpperInvariant(text[0]) + text.Substring(1).ToLowerInvariant();
         }
 
-        private string GetCommandIdFromCWs(Antlr4.Runtime.Tree.ITerminalNode[] cws)
+        private string GetCommandIdFromCWs(Antlr4.Runtime.Tree.ITerminalNode[] cws, int[] argPositions)
         {
             StringBuilder result = new StringBuilder();
-            result.Append(ToTitle(cws[0].Symbol.Text));
-            int paramIdx = 0;
-            for (int i = 1; i < cws.Length; i++)
+            int cwIdx = 0;
+            int argIdx = 0;
+            int argsLength = argPositions.Length;
+            int cmdLength = cws.Length + argsLength;
+            for (int i = 0; i < cmdLength; i++)
             {
-                for (int j = 0; j < cws[i].Symbol.TokenIndex - cws[i - 1].Symbol.TokenIndex - 1; j++)
+                if (argIdx < argsLength && argPositions[argIdx] == i)
                 {
-                    result.Append(++paramIdx);
+                    result.Append(argIdx + 1);
+                    argIdx++;
                 }
-                result.Append(ToTitle(cws[i].Symbol.Text));
+                else
+                {
+                    result.Append(ToTitle(cws[cwIdx].Symbol.Text));
+                    cwIdx++;
+                }
             }
             return result.ToString();
         }

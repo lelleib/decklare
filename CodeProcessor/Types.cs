@@ -16,12 +16,14 @@ namespace CodeProcessor
         NumberPredicate,
         Pile,
         Player,
+        PutExpression,
         Supply,
+        TakeExpression,
         Void,
         ErrorType
     }
 
-    public class SymbolType
+    public record SymbolType
     {
 
         public static SymbolType BOOLEAN = new SymbolType(SymbolTypeEnum.Boolean);
@@ -33,7 +35,9 @@ namespace CodeProcessor
         public static SymbolType PILE = new SymbolType(SymbolTypeEnum.Pile);
         public static SymbolType PLAYER = new SymbolType(SymbolTypeEnum.Player);
         public static SymbolType PLAYERLIST = new SymbolType(SymbolTypeEnum.List, PLAYER);
+        public static SymbolType PUTEXPRESSION = new SymbolType(SymbolTypeEnum.PutExpression);
         public static SymbolType SUPPLY = new SymbolType(SymbolTypeEnum.Supply);
+        public static SymbolType TAKEEXPRESSION = new SymbolType(SymbolTypeEnum.TakeExpression);
         public static SymbolType VOID = new SymbolType(SymbolTypeEnum.Void);
         public static SymbolType ERRORTYPE = new SymbolType(SymbolTypeEnum.ErrorType);
 
@@ -47,6 +51,20 @@ namespace CodeProcessor
             this.MainType = mainType;
             this.SubType = subType;
             this.EnumSubType = enumSubType;
+        }
+
+        public override string ToString()
+        {
+            string? param = null;
+            if (SubType is not null)
+            {
+                param = $"<{SubType}>";
+            }
+            else if (EnumSubType is not null)
+            {
+                param = $"<{EnumSubType}>";
+            }
+            return MainType + param;
         }
     }
 
@@ -106,14 +124,7 @@ namespace CodeProcessor
 
         public bool IsConvertibleTo(SymbolType sourceType, SymbolType targetType)
         {
-            if (sourceType == targetType || (targetType.MainType == SymbolTypeEnum.List && targetType.SubType == sourceType) || (sourceType == SymbolType.ERRORTYPE || targetType == SymbolType.ERRORTYPE))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return sourceType == targetType || (targetType.MainType == SymbolTypeEnum.List && targetType.SubType == sourceType) || (sourceType == SymbolType.ERRORTYPE || targetType == SymbolType.ERRORTYPE);
         }
 
         public SymbolType GetMemberType(SymbolType rootType, string[] path)

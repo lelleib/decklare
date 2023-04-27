@@ -12,20 +12,15 @@ commandDefinition: LPAREN commandDeclaration RPAREN COLON block;
 
 varDefinition: (varName=ID) COLON;
 assignment: varRef COLONEQ;
-command: CW (CW | expression)*;
-commandDeclaration: CW (CW | argumentDeclaration)*;
+command: expression* CW (CW | expression)*;
+commandDeclaration: argumentDeclaration* CW (CW | argumentDeclaration)*;
 argumentDeclaration: LPAREN name=ID COLON typeDefinition RPAREN;
 typeDefinition: mainType=CW (LT subType=typeDefinition GT)?;
 
-expression: varRef | block | numericExpression | booleanExpression | numberPredicate | cardPredicate | enumLiteral;
+expression: varRef | block | numericExpression | booleanExpression | numberPredicate | cardPredicate | enumLiteral | takeExpression | putExpression;
 block: LCURLY statementList RCURLY;
-//varRef: ID varRef2;
-//varRef2: (SSUFFIX varRef varRef2)?;
-varRef: varName=(ID | X) (SSUFFIX ID)*;
-//numericExpression: (NUM | varRef) numericExpression2;
-//numericExpression2: (op=(MULT | DIV | PLUS | MINUS) numericExpression numericExpression2)?;
-//booleanExpression: (relationExpression | enumIsExpression) booleanExpression2;
-//booleanExpression2: (op=(AND | OR) booleanExpression booleanExpression2)?;
+varRef: varName=(ID | X | IT) varMemberPath;
+varMemberPath: (SSUFFIX ID)*;
 numericExpression: numericExpression (MULT | DIV | MOD) numericExpression
                     | numericExpression (PLUS | MINUS) numericExpression
                     | (NUM | varRef)
@@ -43,6 +38,9 @@ numberPredicate: LT booleanExpression GT;
 cardPredicate: LBRACKET booleanExpression RBRACKET;
 
 enumLiteral: variant=CW COLON enumType=CW;
+
+takeExpression: BACKSLASH command BACKSLASH;
+putExpression: DIV command DIV;
 
 PLUS: '+';
 MINUS: '-';
@@ -75,18 +73,12 @@ LPAREN: '(';
 RPAREN: ')';
 LBRACKET: '[';
 RBRACKET: ']';
-
-/*CARD: 'CARD';
-PILE: 'PILE';
-SUPPLY: 'SUPPLY';
-NUMBER: 'NUMBER';
-ENUM: 'ENUM';
-PLAYER: 'PLAYER';
-LIST: 'LIST';*/
+BACKSLASH: '\\';
 
 NUM: ('0' | [1-9][0-9]*);
+X: 'X';
+IT: 'IT';
 CW: [A-Z][A-Z]+;
 ID: ([a-z] | [a-zA-Z][a-zA-Z0-9_]+);
-X: 'X';
 NL: ('\n' | '\r')+;
 WS: (' ' | '\t') -> skip;

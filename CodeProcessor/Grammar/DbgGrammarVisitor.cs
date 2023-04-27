@@ -118,6 +118,12 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitVarRef([NotNull] DbgGrammarParser.VarRefContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.varMemberPath"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitVarMemberPath([NotNull] DbgGrammarParser.VarMemberPathContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="DbgGrammarParser.numericExpression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -165,5 +171,17 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitEnumLiteral([NotNull] DbgGrammarParser.EnumLiteralContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.takeExpression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTakeExpression([NotNull] DbgGrammarParser.TakeExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.putExpression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPutExpression([NotNull] DbgGrammarParser.PutExpressionContext context);
 }
 } // namespace CodeProcessor.Grammar

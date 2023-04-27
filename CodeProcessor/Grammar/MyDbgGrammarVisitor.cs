@@ -90,5 +90,20 @@ namespace CodeProcessor.Grammar
             ctlr.VerifyEnumLiteral(context);
             return base.VisitEnumLiteral(context);
         }
+
+        public override List<string> VisitTakeExpression([NotNull] DbgGrammarParser.TakeExpressionContext context)
+        {
+            ctlr.VerifyTakeExpression(context);
+            return base.VisitTakeExpression(context);
+        }
+
+        public override List<string> VisitPutExpression([NotNull] DbgGrammarParser.PutExpressionContext context)
+        {
+            ctlr.VerifyPutExpression(context);
+            ctlr.PushNewPutExpressionScope();
+            var result = base.VisitPutExpression(context);
+            ctlr.PopScope();
+            return result;
+        }
     }
 }

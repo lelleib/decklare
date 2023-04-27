@@ -1,4 +1,4 @@
 
-LET (player: PLAYER) CHOOSE A CARD TO GAIN TO (pile: PILE) COSTING UP TO (n: NUMBER){
-    LET user CHOOSE 1 FROM Supply WHERE (x's Cost - Discount <= n) AND PUT IT TO pile
+(LET (player: PLAYER) CHOOSE CARD TO GAIN TO (pile: PILE) COSTING UP TO (n: NUMBER)):{
+    \LET player CHOOSE 1 WHERE [X's Cost - Discount <= n]\ FROM Supply AND /PUT IT/ TO pile
 }
