@@ -90,14 +90,14 @@ namespace CodeProcessor.Grammar
             this.currentScope = this.currentScope.Parent ?? this.currentScope;
         }
 
-        public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.StatementContext context)
+        public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.VarDefinitionContext context)
         {
             // add variable if variable definition
-            var varDefinition = context.varDefinition();
-            if (varDefinition != null)
+            /*var varDefinition = context.varDefinition();
+            if (varDefinition is not null)*/
             {
-                var varName = varDefinition.varName.Text;
-                var varType = GetAssignorType(context);
+                var varName = context.varName.Text;
+                var varType = GetAssignorType((DbgGrammarParser.StatementContext)context.Parent);
                 if (varType == SymbolType.VOID)
                 {
                     SignalError("Cannot assign a command without return value to a variable", context);
@@ -115,14 +115,14 @@ namespace CodeProcessor.Grammar
             }
         }
 
-        public void VerifyAssignment(DbgGrammarParser.StatementContext context)
+        public void VerifyAssignment(DbgGrammarParser.AssignmentContext context)
         {
-            // check validity if assignment
-            var assignment = context.assignment();
-            if (assignment != null)
+            // check validity
+            /*var assignment = context.assignment();
+            if (assignment is not null)*/
             {
-                var assigneeType = GetVariableType(assignment.varRef());
-                var assignorType = GetAssignorType(context);
+                var assigneeType = GetVariableType(context.varRef());
+                var assignorType = GetAssignorType((DbgGrammarParser.StatementContext)context.Parent);
                 if (!typeSystem.IsConvertibleTo(assignorType, assigneeType))
                 {
                     SignalError($"Types in assignment ('{assigneeType}' and '{assignorType}') do not match", context);
@@ -130,21 +130,13 @@ namespace CodeProcessor.Grammar
             }
         }
 
-        public void VerifyCommand(DbgGrammarParser.CommandContext context)
+        public void VerifyCommandCall(DbgGrammarParser.CommandContext context)
         {
             try
             {
                 var signature = GetCommandSignature(context);
                 var arguments = context.expression();
-                for (int i = 0; i < arguments.Length; i++)
-                {
-                    var inputType = GetExpressionType(arguments[i]);
-                    var expectedType = signature.Arguments[i];
-                    if (!typeSystem.IsConvertibleTo(inputType, expectedType))
-                    {
-                        SignalError($"The command's {i + 1}. argument have a wrong type ('{inputType}' but '{expectedType}' is expected)", context);
-                    }
-                }
+                VerifyCommandArguments(signature, context);
             }
             catch (Exception ex)
             {
@@ -154,22 +146,34 @@ namespace CodeProcessor.Grammar
 
         public void VerifyVarRef(DbgGrammarParser.VarRefContext context)
         {
-            var type = GetVariableType(context);
+            string varName = context.varName.Text;
+            string[] memberPath = GetMemberPath(context);
+            var type = this.currentScope[varName];
+
             if (type == SymbolType.ERRORTYPE)
             {
                 SignalError($"Variable '{context.varName.Text}' does not exist in the current context", context);
+            }
+
+            try
+            {
+                typeSystem.GetMemberType(type, memberPath);
+            }
+            catch (Exception ex)
+            {
+                SignalError(ex.Message, context);
             }
         }
 
         public void VerifyNumericExpression(DbgGrammarParser.NumericExpressionContext context)
         {
             var varRef = context.varRef();
-            if (varRef != null)
+            if (varRef is not null)
             {
                 var type = GetVariableType(varRef);
                 if (!typeSystem.IsConvertibleTo(type, SymbolType.NUMBER))
                 {
-                    SignalError($"Variable '{varRef.GetText()}' used in numeric expression but is of type '{type}'", context);
+                    SignalError($"Variable '{VarRefToString(varRef)}' used in numeric expression but is of type '{type}'", context);
                 }
             }
         }
@@ -177,12 +181,12 @@ namespace CodeProcessor.Grammar
         public void VerifyBooleanExpression(DbgGrammarParser.BooleanExpressionContext context)
         {
             var varRef = context.varRef();
-            if (varRef != null)
+            if (varRef is not null)
             {
                 var type = GetVariableType(varRef);
                 if (!typeSystem.IsConvertibleTo(type, SymbolType.BOOLEAN))
                 {
-                    SignalError($"Variable '{varRef.GetText()}' used in boolean expression but is of type '{type}'", context);
+                    SignalError($"Variable '{VarRefToString(varRef)}' used in boolean expression but is of type '{type}'", context);
                 }
             }
         }
@@ -267,49 +271,33 @@ namespace CodeProcessor.Grammar
             }
         }
 
-        public void VerifyTakeExpression(DbgGrammarParser.TakeExpressionContext context)
+        public void VerifyPileCommand(DbgGrammarParser.CommandContext context)
         {
-            // check if the embedded command has PILE as last parameter and returns PILE
-            CommandSignature takeCommandSignature;
+            // check if the embedded command exists (with PILE as last parameter) and returns PILE
+            var cws = context.CW();
+            var argPositions = Enumerable.Range(0, context.ChildCount).Where(i => context.GetChild(i).GetType() == typeof(DbgGrammarParser.ExpressionContext)).ToList();
+            argPositions.Add(cws.Length + argPositions.Count);
+            var commandId = GetCommandIdFromCWs(cws, argPositions.ToArray());
+
             try
             {
-                takeCommandSignature = GetCommandSignature(context.command());
-            }
-            catch (System.Exception)
-            {
-                return;
-            }
+                var pileCommandSignature = this.commandRegistry[commandId];
 
-            if (takeCommandSignature.Arguments.Last() != SymbolType.PILE)
-            {
-                SignalError($"{SymbolType.TAKEEXPRESSION}s have to contain a commad whose last parameter has got a type of '{SymbolType.PILE}'", context);
-            }
-            if (takeCommandSignature.CommandType != SymbolType.PILE)
-            {
-                SignalError($"{SymbolType.TAKEEXPRESSION}s have to contain a commad that returns value of type '{SymbolType.PILE}'", context);
-            }
-        }
+                if (pileCommandSignature.Arguments.Last() != SymbolType.PILE)
+                {
+                    throw new Exception($"Command must have last parameter of type '{SymbolType.PILE}'");
+                }
+                if (pileCommandSignature.CommandType != SymbolType.PILE)
+                {
+                    throw new Exception($"Command must return value of type '{SymbolType.PILE}'");
+                }
 
-        public void VerifyPutExpression(DbgGrammarParser.PutExpressionContext context)
-        {
-            // check if the embedded command has PILE as last parameter and returns PILE
-            CommandSignature putCommandSignature;
-            try
-            {
-                putCommandSignature = GetCommandSignature(context.command());
+                pileCommandSignature.Arguments = pileCommandSignature.Arguments.SkipLast(1).ToArray();
+                VerifyCommandArguments(pileCommandSignature, context);
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                return;
-            }
-
-            if (putCommandSignature.Arguments.Last() != SymbolType.PILE)
-            {
-                SignalError($"{SymbolType.PUTEXPRESSION}s have to contain a commad whose last parameter has got a type of '{SymbolType.PILE}'", context);
-            }
-            if (putCommandSignature.CommandType != SymbolType.PILE)
-            {
-                SignalError($"{SymbolType.PUTEXPRESSION}s have to contain a commad that returns value of type '{SymbolType.PILE}'", context);
+                SignalError($"Problem with pile command: {ex.Message}", context);
             }
         }
 
@@ -323,9 +311,21 @@ namespace CodeProcessor.Grammar
         private SymbolType GetVariableType(DbgGrammarParser.VarRefContext context)
         {
             string varName = context.varName.Text;
-            string[] memberPath = context.varMemberPath().ID().Select(id => id.Symbol.Text).ToArray();
+            string[] memberPath = GetMemberPath(context);
             var type = this.currentScope[varName];
-            return typeSystem.GetMemberType(type, memberPath);
+            try
+            {
+                return typeSystem.GetMemberType(type, memberPath);
+            }
+            catch (Exception)
+            {
+                return SymbolType.ERRORTYPE;
+            }
+        }
+
+        private string[] GetMemberPath(DbgGrammarParser.VarRefContext context)
+        {
+            return context.varMemberPath().ID().Select(id => id.Symbol.Text).ToArray();
         }
 
         private CommandSignature GetCommandSignature(DbgGrammarParser.CommandContext context)
@@ -350,37 +350,37 @@ namespace CodeProcessor.Grammar
         private SymbolType GetExpressionType(DbgGrammarParser.ExpressionContext context)
         {
             var varRef = context.varRef();
-            if (varRef != null)
+            if (varRef is not null)
             {
                 return GetVariableType(varRef);
             }
             var block = context.block();
-            if (block != null)
+            if (block is not null)
             {
                 return SymbolType.EFFECT;
             }
             var numericExpression = context.numericExpression();
-            if (numericExpression != null)
+            if (numericExpression is not null)
             {
                 return SymbolType.NUMBER;
             }
             var booleanExpression = context.booleanExpression();
-            if (booleanExpression != null)
+            if (booleanExpression is not null)
             {
                 return SymbolType.BOOLEAN;
             }
             var numberPredicate = context.numberPredicate();
-            if (numberPredicate != null)
+            if (numberPredicate is not null)
             {
                 return SymbolType.NUMBERPREDICATE;
             }
             var cardPredicate = context.cardPredicate();
-            if (cardPredicate != null)
+            if (cardPredicate is not null)
             {
                 return SymbolType.CARDPREDICATE;
             }
             var enumLiteral = context.enumLiteral();
-            if (enumLiteral != null)
+            if (enumLiteral is not null)
             {
                 return GetEnumLiteralType(enumLiteral);
             }
@@ -390,7 +390,7 @@ namespace CodeProcessor.Grammar
         private SymbolType GetAssignorType(DbgGrammarParser.StatementContext context)
         {
             var command = context.command();
-            if (command != null)
+            if (command is not null)
             {
                 return GetCommandType(command);
             }
@@ -411,6 +411,20 @@ namespace CodeProcessor.Grammar
             {
                 SignalError($"Type {context.GetText()} does not exist: {ex.Message}", context);
                 return SymbolType.ERRORTYPE;
+            }
+        }
+
+        private void VerifyCommandArguments(CommandSignature signature, DbgGrammarParser.CommandContext context)
+        {
+            var arguments = context.expression();
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                var inputType = GetExpressionType(arguments[i]);
+                var expectedType = signature.Arguments[i];
+                if (!typeSystem.IsConvertibleTo(inputType, expectedType))
+                {
+                    SignalError($"The command's {i + 1}. argument have a wrong type ('{inputType}' but '{expectedType}' is expected)", context);
+                }
             }
         }
 
@@ -451,7 +465,7 @@ namespace CodeProcessor.Grammar
         {
             acc.Add(context.mainType.Text);
 
-            if (context.subType == null)
+            if (context.subType is null)
             {
                 return acc.ToArray();
             }
@@ -459,6 +473,13 @@ namespace CodeProcessor.Grammar
             {
                 return TDContextToTypeChain(context.subType, acc);
             }
+        }
+
+        private string VarRefToString(DbgGrammarParser.VarRefContext context)
+        {
+            var ids = new List<string>{context.varName.Text};
+            ids.AddRange(context.varMemberPath().ID().Select(t => t.Symbol.Text));
+            return string.Join("'s ", ids);
         }
 
         private SymbolType GetEnumLiteralType(DbgGrammarParser.EnumLiteralContext context)

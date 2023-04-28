@@ -22,8 +22,11 @@ namespace CodeProcessor.Grammar
 
         public override List<string> VisitStatement([NotNull] DbgGrammarParser.StatementContext context)
         {
-            ctlr.AddVerifyVariableFromVarDefinition(context);
-            ctlr.VerifyAssignment(context);
+            var command = context.command();
+            if (command is not null)
+            {
+                ctlr.VerifyCommandCall(command);
+            }
             return base.VisitStatement(context);
         }
 
@@ -33,10 +36,16 @@ namespace CodeProcessor.Grammar
             return base.VisitCommandDeclaration(context);
         }
 
-        public override List<string> VisitCommand([NotNull] DbgGrammarParser.CommandContext context)
+        public override List<string> VisitVarDefinition([NotNull] DbgGrammarParser.VarDefinitionContext context)
         {
-            ctlr.VerifyCommand(context);
-            return base.VisitCommand(context);
+            ctlr.AddVerifyVariableFromVarDefinition(context);
+            return base.VisitVarDefinition(context);
+        }
+
+        public override List<string> VisitAssignment([NotNull] DbgGrammarParser.AssignmentContext context)
+        {
+            ctlr.VerifyAssignment(context);
+            return base.VisitAssignment(context);
         }
 
         public override List<string> VisitVarRef([NotNull] DbgGrammarParser.VarRefContext context)
@@ -93,13 +102,13 @@ namespace CodeProcessor.Grammar
 
         public override List<string> VisitTakeExpression([NotNull] DbgGrammarParser.TakeExpressionContext context)
         {
-            ctlr.VerifyTakeExpression(context);
+            ctlr.VerifyPileCommand(context.command());
             return base.VisitTakeExpression(context);
         }
 
         public override List<string> VisitPutExpression([NotNull] DbgGrammarParser.PutExpressionContext context)
         {
-            ctlr.VerifyPutExpression(context);
+            ctlr.VerifyPileCommand(context.command());
             ctlr.PushNewPutExpressionScope();
             var result = base.VisitPutExpression(context);
             ctlr.PopScope();
