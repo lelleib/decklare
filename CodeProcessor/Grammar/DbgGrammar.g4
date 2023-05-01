@@ -37,7 +37,7 @@ listHasExpression: varRef HAS NO? varRef;
 numberPredicate: LT booleanExpression GT;
 cardPredicate: LBRACKET booleanExpression RBRACKET;
 
-enumLiteral: variant=CW COLON enumType=CW;
+enumLiteral: variant=ID LPAREN enumType=CW RPAREN;
 
 takeExpression: BACKSLASH command BACKSLASH;
 putExpression: DIV command DIV;

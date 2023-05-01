@@ -1,4 +1,7 @@
 
 (LET (player: PLAYER) CHOOSE CARD TO GAIN TO (pile: PILE) COSTING UP TO (n: NUMBER)):{
     \LET player CHOOSE 1 WHERE [X's Cost - Discount <= n]\ FROM Supply AND /PUT IT/ TO pile
+    a: 5
+    a := a+2
+    b: AllVisible(VISIBILITY)
 }
