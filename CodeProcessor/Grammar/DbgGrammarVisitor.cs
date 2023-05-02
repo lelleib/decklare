@@ -58,11 +58,23 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitStatement([NotNull] DbgGrammarParser.StatementContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.definitionStatement"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDefinitionStatement([NotNull] DbgGrammarParser.DefinitionStatementContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="DbgGrammarParser.commandDefinition"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitCommandDefinition([NotNull] DbgGrammarParser.CommandDefinitionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.cardDefinition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCardDefinition([NotNull] DbgGrammarParser.CardDefinitionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DbgGrammarParser.varDefinition"/>.
 	/// </summary>
@@ -87,6 +99,12 @@ public interface IDbgGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitCommandDeclaration([NotNull] DbgGrammarParser.CommandDeclarationContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DbgGrammarParser.propertyDefinition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPropertyDefinition([NotNull] DbgGrammarParser.PropertyDefinitionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DbgGrammarParser.argumentDeclaration"/>.
 	/// </summary>

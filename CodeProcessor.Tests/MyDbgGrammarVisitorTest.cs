@@ -15,10 +15,7 @@ public class MyDbgGrammarVisitorTest
     [Fact]
     public void TestCodeSematicsFromFile()
     {
-        var fileNameBase = "SemanticTest";
-        int i = 1;
-        string fileName = @$"..\..\..\testfiles\{fileNameBase}{i}.dbg";
-        while (File.Exists(fileName))
+        foreach (var fileName in Directory.GetFiles(@"..\..\..\testfiles\"))
         {
             var code = File.ReadAllText(fileName);
             var parser = CodeProcessor.Processor.GetParser(code);
@@ -31,8 +28,6 @@ public class MyDbgGrammarVisitorTest
                 _testOutput.WriteLine(item);
             }
             Assert.Empty(errors);
-
-            fileName = @$"..\..\..\testfiles\{fileNameBase}{++i}.dbg";
         }
     }
 }

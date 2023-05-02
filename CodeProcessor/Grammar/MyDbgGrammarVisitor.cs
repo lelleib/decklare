@@ -27,6 +27,8 @@ namespace CodeProcessor.Grammar
             {
                 ctlr.VerifyCommandCall(command);
             }
+            ctlr.AddVerifyVariableFromVarDefinition(context);
+            ctlr.VerifyAssignment(context);
             return base.VisitStatement(context);
         }
 
@@ -36,16 +38,10 @@ namespace CodeProcessor.Grammar
             return base.VisitCommandDeclaration(context);
         }
 
-        public override List<string> VisitVarDefinition([NotNull] DbgGrammarParser.VarDefinitionContext context)
+        public override List<string> VisitCardDefinition([NotNull] DbgGrammarParser.CardDefinitionContext context)
         {
-            ctlr.AddVerifyVariableFromVarDefinition(context);
-            return base.VisitVarDefinition(context);
-        }
-
-        public override List<string> VisitAssignment([NotNull] DbgGrammarParser.AssignmentContext context)
-        {
-            ctlr.VerifyAssignment(context);
-            return base.VisitAssignment(context);
+            ctlr.VerifyCardDefinition(context);
+            return base.VisitCardDefinition(context);
         }
 
         public override List<string> VisitVarRef([NotNull] DbgGrammarParser.VarRefContext context)

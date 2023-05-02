@@ -4,16 +4,21 @@ grammar DbgGrammar;
 
 program: definitionStatementList EOF;
 statementList: NL? (statement (NL statement)*)? NL?;
-definitionStatementList: NL? ((commandDefinition | statement) (NL (commandDefinition | statement))*)? NL?;
+definitionStatementList: NL? (definitionStatement (NL definitionStatement)*)? NL?;
 
 statement: (varDefinition | assignment)? (command | expression);
+definitionStatement: cardDefinition | commandDefinition | statement;
 
 commandDefinition: LPAREN commandDeclaration RPAREN COLON block;
+
+cardDefinition: cardName=ID LBRACKET NL? (propertyDefinition (NL propertyDefinition)*) NL? RBRACKET;
 
 varDefinition: (varName=ID) COLON;
 assignment: varRef COLONEQ;
 command: expression* CW (CW | expression)*;
 commandDeclaration: argumentDeclaration* CW (CW | argumentDeclaration)*;
+propertyDefinition: varDefinition expression;
+
 argumentDeclaration: LPAREN name=ID COLON typeDefinition RPAREN;
 typeDefinition: mainType=CW (LT subType=typeDefinition GT)?;
 

@@ -90,14 +90,14 @@ namespace CodeProcessor.Grammar
             this.currentScope = this.currentScope.Parent ?? this.currentScope;
         }
 
-        public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.VarDefinitionContext context)
+        public void AddVerifyVariableFromVarDefinition(DbgGrammarParser.StatementContext context)
         {
             // add variable if variable definition
-            /*var varDefinition = context.varDefinition();
-            if (varDefinition is not null)*/
+            var varDefinition = context.varDefinition();
+            if (varDefinition is not null)
             {
-                var varName = context.varName.Text;
-                var varType = GetAssignorType((DbgGrammarParser.StatementContext)context.Parent);
+                var varName = context.varDefinition().varName.Text;
+                var varType = GetAssignorType(context);
                 if (varType == SymbolType.VOID)
                 {
                     SignalError("Cannot assign a command without return value to a variable", context);
@@ -115,14 +115,14 @@ namespace CodeProcessor.Grammar
             }
         }
 
-        public void VerifyAssignment(DbgGrammarParser.AssignmentContext context)
+        public void VerifyAssignment(DbgGrammarParser.StatementContext context)
         {
-            // check validity
-            /*var assignment = context.assignment();
-            if (assignment is not null)*/
+            // check validity if assignment
+            var assignment = context.assignment();
+            if (assignment is not null)
             {
-                var assigneeType = GetVariableType(context.varRef());
-                var assignorType = GetAssignorType((DbgGrammarParser.StatementContext)context.Parent);
+                var assigneeType = GetVariableType(context.assignment().varRef());
+                var assignorType = GetAssignorType(context);
                 if (!typeSystem.IsConvertibleTo(assignorType, assigneeType))
                 {
                     SignalError($"Types in assignment ('{assigneeType}' and '{assignorType}') do not match", context);
@@ -306,6 +306,16 @@ namespace CodeProcessor.Grammar
             // create nested scope and add input variable
             this.currentScope = new Scope(this.currentScope);
             this.currentScope["IT"] = SymbolType.PILE;
+        }
+
+        public void VerifyCardDefinition(DbgGrammarParser.CardDefinitionContext context)
+        {
+            int propertyCount = context.propertyDefinition().Length;
+            int distinctPropertyCount = context.propertyDefinition().GroupBy(pd => pd.varDefinition().varName.Text).Count();
+            if (propertyCount > distinctPropertyCount)
+            {
+                SignalError("Card definition's properties must be unique", context);
+            }
         }
 
         private SymbolType GetVariableType(DbgGrammarParser.VarRefContext context)

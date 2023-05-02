@@ -5,16 +5,10 @@ public class DbgGrammarParserTest
     [Fact]
     public void TestCodeSyntaxFromFile()
     {
-
-        var fileNameBase = "SyntacticTest";
-        int i = 1;
-        string fileName = @$"..\..\..\testfiles\{fileNameBase}{i}.dbg";
-        while (File.Exists(fileName))
+        foreach (var fileName in Directory.GetFiles(@"..\..\..\testfiles\"))
         {
             var code = File.ReadAllText(fileName);
             var parser = CodeProcessor.Processor.GetParser(code);
-
-            fileName = @$"..\..\..\testfiles\{fileNameBase}{++i}.dbg";
         }
     }
 }
