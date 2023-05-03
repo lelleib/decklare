@@ -394,6 +394,16 @@ namespace CodeProcessor.Grammar
             {
                 return GetEnumLiteralType(enumLiteral);
             }
+            var takeExpression = context.takeExpression();
+            if (takeExpression is not null)
+            {
+                return SymbolType.TAKEEXPRESSION;
+            }
+            var putExpression = context.putExpression();
+            if (putExpression is not null)
+            {
+                return SymbolType.PUTEXPRESSION;
+            }
             return SymbolType.ERRORTYPE;
         }
 
