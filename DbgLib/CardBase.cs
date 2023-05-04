@@ -1,5 +1,4 @@
 ﻿namespace DbgLib;
-public class Player
+public class CardBase
 {
-
 }
