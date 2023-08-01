@@ -14,7 +14,7 @@ public abstract class DbgEnvironmentBase
         this.runtime = runtime;
     }
 
-    public Card 1From2And3To4()
+    public CardBase 1From2And3To4()
     {
         return default!;
     }
