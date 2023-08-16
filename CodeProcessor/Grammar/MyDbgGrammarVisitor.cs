@@ -98,13 +98,13 @@ namespace CodeProcessor.Grammar
 
         public override List<string> VisitTakeExpression([NotNull] DbgGrammarParser.TakeExpressionContext context)
         {
-            ctlr.VerifyPileCommand(context.command());
+            ctlr.VerifyTakeCommand(context.command());
             return base.VisitTakeExpression(context);
         }
 
         public override List<string> VisitPutExpression([NotNull] DbgGrammarParser.PutExpressionContext context)
         {
-            ctlr.VerifyPileCommand(context.command());
+            ctlr.VerifyPutCommand(context.command());
             ctlr.PushNewPutExpressionScope();
             var result = base.VisitPutExpression(context);
             ctlr.PopScope();

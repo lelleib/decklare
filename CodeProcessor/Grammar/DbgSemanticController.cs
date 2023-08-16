@@ -47,14 +47,20 @@ namespace CodeProcessor.Grammar
                 ("Let1Choose2Where34", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.CARDPREDICATE,SymbolType.PILE})),
                 ("TakeAll1", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PILE})),
                 ("TakeAllWhere12", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.CARDPREDICATE,SymbolType.PILE})),
-                ("Put12", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.CARD,SymbolType.PILE})),
-                ("Let1Put2Anywhere3", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
+                ("Put12", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE,SymbolType.PILE})),
+                ("Let1Put2Anywhere3", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE,SymbolType.PILE})),
                 ("Let1Arrange2", new CommandSignature(SymbolType.PILE, new SymbolType[]{SymbolType.PLAYER,SymbolType.PILE})),
                 ("Shuffle1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
                 ("Rotate1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PILE})),
                 ("Execute1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
                 ("Clone1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
                 ("Detach1FromCard", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+                ("Repeat1", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.EFFECT})),
+                ("For12", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYERLIST,SymbolType.EFFECT})),
+                ("Let1ChooseIf2", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.EFFECT})),
+                ("Let1Choose2From3And4", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.PLAYER,SymbolType.NUMBER,SymbolType.EFFECT,SymbolType.EFFECT})),
+                ("While12", new CommandSignature(SymbolType.VOID, new SymbolType[]{SymbolType.BOOLEAN,SymbolType.EFFECT})),
+                ("NewPile", new CommandSignature(SymbolType.PILE, new SymbolType[]{})),
                 ("InitDominion", new CommandSignature(SymbolType.VOID, new SymbolType[]{}))
             };
 
@@ -271,34 +277,14 @@ namespace CodeProcessor.Grammar
             }
         }
 
-        public void VerifyPileCommand(DbgGrammarParser.CommandContext context)
+        public void VerifyTakeCommand(DbgGrammarParser.CommandContext context)
         {
-            // check if the embedded command exists (with PILE as last parameter) and returns PILE
-            var cws = context.CW();
-            var argPositions = Enumerable.Range(0, context.ChildCount).Where(i => context.GetChild(i).GetType() == typeof(DbgGrammarParser.ExpressionContext)).ToList();
-            argPositions.Add(cws.Length + argPositions.Count);
-            var commandId = GetCommandIdFromCWs(cws, argPositions.ToArray());
+            VerifyPileCommand(context, SymbolType.PILE);
+        }
 
-            try
-            {
-                var pileCommandSignature = this.commandRegistry[commandId];
-
-                if (pileCommandSignature.Arguments.Last() != SymbolType.PILE)
-                {
-                    throw new Exception($"Command must have last parameter of type '{SymbolType.PILE}'");
-                }
-                if (pileCommandSignature.CommandType != SymbolType.PILE)
-                {
-                    throw new Exception($"Command must return value of type '{SymbolType.PILE}'");
-                }
-
-                pileCommandSignature.Arguments = pileCommandSignature.Arguments.SkipLast(1).ToArray();
-                VerifyCommandArguments(pileCommandSignature, context);
-            }
-            catch (Exception ex)
-            {
-                SignalError($"Problem with pile command: {ex.Message}", context);
-            }
+        public void VerifyPutCommand(DbgGrammarParser.CommandContext context)
+        {
+            VerifyPileCommand(context, SymbolType.VOID);
         }
 
         public void PushNewPutExpressionScope()
@@ -448,6 +434,36 @@ namespace CodeProcessor.Grammar
             }
         }
 
+        private void VerifyPileCommand(DbgGrammarParser.CommandContext context, SymbolType expectedCommandType)
+        {
+            // check if the embedded command exists (with PILE as last parameter) and returns 'expectedCommandType'
+            var cws = context.CW();
+            var argPositions = Enumerable.Range(0, context.ChildCount).Where(i => context.GetChild(i).GetType() == typeof(DbgGrammarParser.ExpressionContext)).ToList();
+            argPositions.Add(cws.Length + argPositions.Count);
+            var commandId = GetCommandIdFromCWs(cws, argPositions.ToArray());
+
+            try
+            {
+                var pileCommandSignature = this.commandRegistry[commandId];
+
+                if (pileCommandSignature.Arguments.Last() != SymbolType.PILE)
+                {
+                    throw new Exception($"Command must have last parameter of type '{SymbolType.PILE}'");
+                }
+                if (pileCommandSignature.CommandType != expectedCommandType)
+                {
+                    throw new Exception($"Command must return value of type '{expectedCommandType}'");
+                }
+
+                pileCommandSignature.Arguments = pileCommandSignature.Arguments.SkipLast(1).ToArray();
+                VerifyCommandArguments(pileCommandSignature, context);
+            }
+            catch (Exception ex)
+            {
+                SignalError($"Problem with pile command: {ex.Message}", context);
+            }
+        }
+
         private string ToTitle(string text)
         {
             return Char.ToUpperInvariant(text[0]) + text.Substring(1).ToLowerInvariant();
@@ -497,7 +513,7 @@ namespace CodeProcessor.Grammar
 
         private string VarRefToString(DbgGrammarParser.VarRefContext context)
         {
-            var ids = new List<string>{context.varName.Text};
+            var ids = new List<string> { context.varName.Text };
             ids.AddRange(context.varMemberPath().ID().Select(t => t.Symbol.Text));
             return string.Join("'s ", ids);
         }
