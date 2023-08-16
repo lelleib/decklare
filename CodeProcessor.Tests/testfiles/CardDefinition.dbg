@@ -4,5 +4,5 @@ Card1 [
         \LET Me CHOOSE 1 WHERE [X's Cost - Discount <= 3]\ FROM Supply AND /PUT IT/ TO Deck
     }
     OtherProp: Attack(CARDTYPES)
-    Prop2: 3
+    Prop3: 3
 ]
