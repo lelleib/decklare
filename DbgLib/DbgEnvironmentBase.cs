@@ -2,8 +2,8 @@ namespace DbgLib;
 
 using CardPredicate = Predicate<CardBase>;
 using Number = Int32;
-using TakeCommand = Func<PileBase, PileBase>;
-using PutCommand = Action<PileBase, PileBase>;
+using TakeCommand = Func<PileBase?, PileBase?>;
+using PutCommand = Action<PileBase?, PileBase?>;
 
 public abstract class DbgEnvironmentBase
 {
