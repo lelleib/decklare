@@ -168,4 +168,15 @@ public abstract class DbgEnvironmentBase
     {
         return new PileBase();
     }
+
+    public void If12(Boolean? condition, Effect? effect)
+    {
+        if (condition is null || effect is null)
+            return;
+
+        if ((bool)condition)
+        {
+            effect.Invoke();
+        }
+    }
 }
