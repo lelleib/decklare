@@ -10,9 +10,9 @@ public abstract class DbgEnvironmentBase
 {
     protected class BreakException : Exception { }
 
-    private static Random rng = new Random();
+    private static readonly Random rng = new();
 
-    private IDbgRuntime runtime;
+    private readonly IDbgRuntime runtime;
 
     private Effect? program;
 
