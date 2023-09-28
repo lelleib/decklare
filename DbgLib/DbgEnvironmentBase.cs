@@ -4,16 +4,39 @@ using CardPredicate = Predicate<CardBase>;
 using Number = Int32;
 using TakeCommand = Func<PileBase?, PileBase?>;
 using PutCommand = Action<PileBase?, PileBase?>;
+using Effect = Action;
 
 public abstract class DbgEnvironmentBase
 {
+    protected class BreakException : Exception { }
+
     private static Random rng = new Random();
 
     private IDbgRuntime runtime;
 
+    private Action? program;
+
     public DbgEnvironmentBase(IDbgRuntime runtime)
     {
         this.runtime = runtime;
+    }
+
+    protected void initProgram(Action program)
+    {
+        this.program = program;
+    }
+
+    public void run()
+    {
+        if (program is null)
+            return;
+
+        try
+        {
+            program();
+        }
+        catch (BreakException)
+        { }
     }
 
     public CardBase? _1From2And3To4(TakeCommand? takeCommand, PileBase? fromPile, PutCommand? putCommand, PileBase? toPile)
@@ -109,7 +132,7 @@ public abstract class DbgEnvironmentBase
         pile.Cards.Add(first);
     }
 
-    public void Execute1(Action? effect)
+    public void Execute1(Effect? effect)
     {
         if (effect is null)
             return;
@@ -117,27 +140,46 @@ public abstract class DbgEnvironmentBase
         effect.Invoke();
     }
 
-    public void Repeat1(Action effect)
+    public void Break()
     {
-        while (true)
-        {
-            effect.Invoke();
-        }
+        throw new BreakException();
     }
 
-    public void For12(List<PlayerBase>? players, Action? effect)
+    public void Repeat1(Effect effect)
+    {
+        try
+        {
+            while (true)
+            {
+                effect.Invoke();
+            }
+        }
+        catch (BreakException)
+        { }
+    }
+
+    public void For12(List<PlayerBase>? players, Effect? effect)
     {
         if (players is null || effect is null)
             return;
 
-        foreach (var player in players)
+        try
         {
-            player.setPlayerContext();
-            effect.Invoke();
+            foreach (var player in players)
+            {
+                player.setPlayerContext();
+                effect.Invoke();
+            }
+        }
+        catch (BreakException)
+        { }
+        finally
+        {
+            // TODO switch context back
         }
     }
 
-    public void Let1ChooseIf2(PlayerBase? player, Action? effect)
+    public void Let1ChooseIf2(PlayerBase? player, Effect? effect)
     {
         if (player is null || effect is null)
             return;
@@ -145,23 +187,28 @@ public abstract class DbgEnvironmentBase
         // TODO
     }
 
-    public void Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Action? effect1, Action? effect2)
+    public void Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Effect? effect1, Effect? effect2)
     {
-        if (player is null || choiceNumber is null || effect1 is null|| effect2 is null)
+        if (player is null || choiceNumber is null || effect1 is null || effect2 is null)
             return;
 
         // TODO
     }
 
-    public void While12(Boolean? condition, Action? effect)
+    public void While12(Boolean? condition, Effect? effect)
     {
         if (condition is null || effect is null)
             return;
 
-        while ((bool)condition)
+        try
         {
-            effect.Invoke();
+            while ((bool)condition)
+            {
+                effect.Invoke();
+            }
         }
+        catch (BreakException)
+        { }
     }
 
     public PileBase NewPile()
