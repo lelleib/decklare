@@ -32,37 +32,37 @@ public class DbgEnvironment : DbgEnvironmentBase
     {
         void program()
         {
-            InitDominion
+            _InitDominion
             (
             3
             );
 
-            Repeat1
+            _Repeat1
             (
             () =>
             {
-                For12
+                _For12
                 (
                 AllPlayers?.ToList<PlayerBase>(),
                 () =>
                 {
-                    While12
+                    _While12
                     (
                     Action > 0,
                     () =>
                     {
-                        Let1Choose2From3And4
+                        _Let1Choose2From3And4
                         (
                         Me,
                         1,
                         () =>
                         {
-                            var card_to_play = NewPile();
+                            var card_to_play = _NewPile();
 
                             _1From2And3To4
                             (
                             (_fromPile) =>
-                                Let1Choose2Where34
+                                _Let1Choose2Where34
                                 (
                                 Me,
                                 1,
@@ -72,7 +72,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                                 ),
                             Hand,
                             (_it, _toPile) =>
-                                Put12
+                                _Put12
                                 (
                                 _it,
                                 _toPile
@@ -82,18 +82,18 @@ public class DbgEnvironment : DbgEnvironmentBase
                         },
                         () =>
                         {
-                            Break();
+                            _Break();
                         }
                         );
                     }
                     );
 
-                    While12
+                    _While12
                     (
                     Buy > 0,
                     () =>
                     {
-                        Let1Choose2From3And4
+                        _Let1Choose2From3And4
                         (
                         Me,
                         1,
@@ -102,7 +102,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                             var card = (Card?) /* TODO impl casting */_1From2And3To4
                             (
                             (_fromPile) =>
-                                Let1Choose2Where34
+                                _Let1Choose2Where34
                                 (
                                 Me,
                                 1,
@@ -112,7 +112,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                                 ),
                             Hand,
                             (_it, _toPile) =>
-                                Put12
+                                _Put12
                                 (
                                 _it,
                                 _toPile
@@ -124,7 +124,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                         },
                         () =>
                         {
-                            Break();
+                            _Break();
                         }
                         );
                     }
@@ -133,13 +133,13 @@ public class DbgEnvironment : DbgEnvironmentBase
                     _1From2And3To4
                     (
                     (_fromPile) =>
-                        TakeAll1
+                        _TakeAll1
                         (
                         _fromPile
                         ),
                     Hand,
                     (_it, _toPile) =>
-                        Put12
+                        _Put12
                         (
                         _it,
                         _toPile
@@ -150,13 +150,13 @@ public class DbgEnvironment : DbgEnvironmentBase
                     _1From2And3To4
                     (
                     (_fromPile) =>
-                        TakeAll1
+                        _TakeAll1
                         (
                         _fromPile
                         ),
                     InPlay,
                     (_it, _toPile) =>
-                        Put12
+                        _Put12
                         (
                         _it,
                         _toPile
@@ -167,14 +167,14 @@ public class DbgEnvironment : DbgEnvironmentBase
                     _1From2And3To4
                     (
                     (_fromPile) =>
-                        Pop12
+                        _Pop12
                         (
                         5,
                         _fromPile
                         ),
                     Deck,
                     (_it, _toPile) =>
-                        Put12
+                        _Put12
                         (
                         _it,
                         _toPile
@@ -190,33 +190,33 @@ public class DbgEnvironment : DbgEnvironmentBase
 
                     Discount = 0;
 
-                    If12
+                    _If12
                     (
                     true /*TODO win condition*/,
                     () =>
                     {
-                        Break();
+                        _Break();
                     }
                     );
                 }
                 );
 
-                If12
+                _If12
                 (
                 true /*TODO win condition*/,
                 () =>
                 {
-                    Break();
+                    _Break();
                 }
                 );
             }
             );
         }
 
-        initProgram(program);
+        InitProgram(program);
     }
 
-    private void InitDominion(int playerCount)
+    private void _InitDominion(int playerCount)
     { // AllPlayers; Supply, Trash, CenterPile
       // AllOtherPlayers, LeftPlayer, RightPlayer; Action, Buy, Coin, Discount, Victory; Deck, Hand, Discard, InPlay
         gamePlay = new Gameplay();
@@ -301,7 +301,7 @@ public class Player : PlayerBase
         this.environment = environment;
     }
 
-    public override void setPlayerContext()
+    public override void SetPlayerContext()
     {
         environment.AllOtherPlayers = AllOtherPlayers;
         environment.LeftPlayer = LeftPlayer;

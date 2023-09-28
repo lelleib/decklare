@@ -1,5 +1,5 @@
 ﻿namespace DbgLib;
 public abstract class PlayerBase
 {
-    public abstract void setPlayerContext();
+    public abstract void SetPlayerContext();
 }

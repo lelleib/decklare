@@ -14,19 +14,19 @@ public abstract class DbgEnvironmentBase
 
     private IDbgRuntime runtime;
 
-    private Action? program;
+    private Effect? program;
 
     public DbgEnvironmentBase(IDbgRuntime runtime)
     {
         this.runtime = runtime;
     }
 
-    protected void initProgram(Action program)
+    protected void InitProgram(Effect program)
     {
         this.program = program;
     }
 
-    public void run()
+    public void Run()
     {
         if (program is null)
             return;
@@ -49,7 +49,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? Pop12(Number? popCount, PileBase? fromPile)
+    public PileBase? _Pop12(Number? popCount, PileBase? fromPile)
     {
         if (popCount is null || fromPile is null)
             return null;
@@ -57,7 +57,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? Let1Choose23(PlayerBase? player, Number? chooseCount, PileBase? fromPile)
+    public PileBase? _Let1Choose23(PlayerBase? player, Number? chooseCount, PileBase? fromPile)
     {
         if (player is null || chooseCount is null || fromPile is null)
             return null;
@@ -65,7 +65,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, PileBase? fromPile)
+    public PileBase? _Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, PileBase? fromPile)
     {
         if (player is null || chooseCount is null || wherePredicate is null || fromPile is null)
             return null;
@@ -73,7 +73,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? TakeAll1(PileBase? fromPile)
+    public PileBase? _TakeAll1(PileBase? fromPile)
     {
         if (fromPile is null)
             return null;
@@ -81,7 +81,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? TakeAllWhere12(CardPredicate? wherePredicate, PileBase? fromPile)
+    public PileBase? _TakeAllWhere12(CardPredicate? wherePredicate, PileBase? fromPile)
     {
         if (wherePredicate is null || fromPile is null)
             return null;
@@ -89,7 +89,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public void Put12(PileBase? pile, PileBase? toPile)
+    public void _Put12(PileBase? pile, PileBase? toPile)
     {
         if (pile is null || toPile is null)
             return;
@@ -97,7 +97,7 @@ public abstract class DbgEnvironmentBase
         // TODO implementation
     }
 
-    public void Let1Put2Anywhere3(PlayerBase? player, PileBase? pile, PileBase? toPile)
+    public void _Let1Put2Anywhere3(PlayerBase? player, PileBase? pile, PileBase? toPile)
     {
         if (player is null || pile is null || toPile is null)
             return;
@@ -105,7 +105,7 @@ public abstract class DbgEnvironmentBase
         // TODO implementation
     }
 
-    public void Let1Arrange2(PlayerBase? player, PileBase? pile)
+    public void _Let1Arrange2(PlayerBase? player, PileBase? pile)
     {
         if (player is null || pile is null)
             return;
@@ -114,7 +114,7 @@ public abstract class DbgEnvironmentBase
         runtime.ArrangePile(pile, player);
     }
 
-    public void Shuffle1(PileBase? pile)
+    public void _Shuffle1(PileBase? pile)
     {
         if (pile is null)
             return;
@@ -122,7 +122,7 @@ public abstract class DbgEnvironmentBase
         pile.Cards.OrderBy(c => rng.Next());
     }
 
-    public void Rotate1(PileBase? pile)
+    public void _Rotate1(PileBase? pile)
     {
         if (pile is null)
             return;
@@ -132,7 +132,7 @@ public abstract class DbgEnvironmentBase
         pile.Cards.Add(first);
     }
 
-    public void Execute1(Effect? effect)
+    public void _Execute1(Effect? effect)
     {
         if (effect is null)
             return;
@@ -140,12 +140,12 @@ public abstract class DbgEnvironmentBase
         effect.Invoke();
     }
 
-    public void Break()
+    public void _Break()
     {
         throw new BreakException();
     }
 
-    public void Repeat1(Effect effect)
+    public void _Repeat1(Effect effect)
     {
         try
         {
@@ -158,7 +158,7 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public void For12(List<PlayerBase>? players, Effect? effect)
+    public void _For12(List<PlayerBase>? players, Effect? effect)
     {
         if (players is null || effect is null)
             return;
@@ -167,7 +167,7 @@ public abstract class DbgEnvironmentBase
         {
             foreach (var player in players)
             {
-                player.setPlayerContext();
+                player.SetPlayerContext();
                 effect.Invoke();
             }
         }
@@ -179,7 +179,7 @@ public abstract class DbgEnvironmentBase
         }
     }
 
-    public void Let1ChooseIf2(PlayerBase? player, Effect? effect)
+    public void _Let1ChooseIf2(PlayerBase? player, Effect? effect)
     {
         if (player is null || effect is null)
             return;
@@ -187,7 +187,7 @@ public abstract class DbgEnvironmentBase
         // TODO
     }
 
-    public void Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Effect? effect1, Effect? effect2)
+    public void _Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Effect? effect1, Effect? effect2)
     {
         if (player is null || choiceNumber is null || effect1 is null || effect2 is null)
             return;
@@ -195,7 +195,7 @@ public abstract class DbgEnvironmentBase
         // TODO
     }
 
-    public void While12(Boolean? condition, Effect? effect)
+    public void _While12(Boolean? condition, Effect? effect)
     {
         if (condition is null || effect is null)
             return;
@@ -211,12 +211,12 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public PileBase NewPile()
+    public PileBase _NewPile()
     {
         return new PileBase();
     }
 
-    public void If12(Boolean? condition, Effect? effect)
+    public void _If12(Boolean? condition, Effect? effect)
     {
         if (condition is null || effect is null)
             return;
