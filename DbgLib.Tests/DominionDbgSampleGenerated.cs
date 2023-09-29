@@ -99,7 +99,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                         1,
                         () =>
                         {
-                            var card = (Card?) /* TODO impl casting */_1From2And3To4
+                            var card = (Card?)_1From2And3To4
                             (
                             (_fromPile) =>
                                 _Let1Choose2Where34
