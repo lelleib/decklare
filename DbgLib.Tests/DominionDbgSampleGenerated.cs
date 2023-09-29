@@ -25,8 +25,8 @@ public class DbgEnvironment : DbgEnvironmentBase
     public Player? ActivePlayer;
     public Player? LeftPlayer;
     public Player? RightPlayer;
-    public List<Player>? AllPlayers;
-    public List<Player>? AllOtherPlayers;
+    public Player[]? AllPlayers;
+    public Player[]? AllOtherPlayers;
 
     public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
     {
@@ -43,7 +43,7 @@ public class DbgEnvironment : DbgEnvironmentBase
             {
                 _For12
                 (
-                AllPlayers?.ToList<PlayerBase>(),
+                AllPlayers,
                 () =>
                 {
                     _While12
@@ -247,9 +247,9 @@ public class DbgEnvironment : DbgEnvironmentBase
         for (int i = 0; i < playerCount; i++)
         {
             var player = gamePlay.AllPlayers[playerCount];
-            player.AllOtherPlayers = gamePlay.AllPlayers.Where((p, j) => j != i).ToList();
+            player.AllOtherPlayers = gamePlay.AllPlayers.Where((p, j) => j != i).ToArray();
             player.RightPlayer = playerCount == 0 ? gamePlay.AllPlayers.Last() : gamePlay.AllPlayers[playerCount - 1];
-            player.LeftPlayer = playerCount == gamePlay.AllPlayers.Count - 1 ? gamePlay.AllPlayers.First() : gamePlay.AllPlayers[playerCount + 1];
+            player.LeftPlayer = playerCount == gamePlay.AllPlayers.Length - 1 ? gamePlay.AllPlayers.First() : gamePlay.AllPlayers[playerCount + 1];
         }
     }
 }
@@ -257,7 +257,7 @@ public class DbgEnvironment : DbgEnvironmentBase
 public class Card : CardBase
 {
     public CardName Name { get; set; }
-    public List<CardType> Types { get; set; } = new List<CardType>();
+    public CardType[] Types { get; set; } = new CardType[0];
     public Number Cost { get; set; }
     public Effect ActionEffect { get; set; } = () => { };
     public Effect TreasureEffect { get; set; } = () => { };
@@ -270,7 +270,7 @@ public class Game
 
 public class Gameplay
 {
-    public List<Player> AllPlayers { get; set; } = new List<Player>();
+    public Player[] AllPlayers { get; set; } = new Player[0];
     public Supply Supply { get; set; } = new Supply();
     public Pile Trash { get; set; } = new Pile();
     public Pile CenterPile { get; set; } = new Pile();
@@ -283,7 +283,7 @@ public class Player : PlayerBase
 {
     private DbgEnvironment environment;
 
-    public List<Player>? AllOtherPlayers { get; set; }
+    public Player[]? AllOtherPlayers { get; set; }
     public Player? LeftPlayer { get; set; }
     public Player? RightPlayer { get; set; }
     public Number? Action { get; set; }

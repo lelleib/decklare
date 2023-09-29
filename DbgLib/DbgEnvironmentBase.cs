@@ -158,7 +158,7 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public void _For12(List<PlayerBase>? players, Effect? effect)
+    public void _For12(PlayerBase[]? players, Effect? effect)
     {
         if (players is null || effect is null)
             return;
