@@ -269,9 +269,6 @@ public class Card : CardBase
 public class Game
 { }
 
-public class Pile : PileBase
-{ }
-
 public class Player : PlayerBase
 {
     private DbgEnvironment environment;

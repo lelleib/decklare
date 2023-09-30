@@ -2,8 +2,8 @@ namespace DbgLib;
 
 using CardPredicate = Predicate<CardBase>;
 using Number = Int32;
-using TakeCommand = Func<PileBase?, PileBase?>;
-using PutCommand = Action<PileBase?, PileBase?>;
+using TakeCommand = Func<Pile?, Pile?>;
+using PutCommand = Action<Pile?, Pile?>;
 using Effect = Action;
 
 public abstract class DbgEnvironmentBase
@@ -39,7 +39,7 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public CardBase? _1From2And3To4(TakeCommand? takeCommand, PileBase? fromPile, PutCommand? putCommand, PileBase? toPile)
+    public CardBase? _1From2And3To4(TakeCommand? takeCommand, Pile? fromPile, PutCommand? putCommand, Pile? toPile)
     {
         if (takeCommand is null || fromPile is null || putCommand is null || toPile is null)
             return null;
@@ -49,7 +49,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? _Pop12(Number? popCount, PileBase? fromPile)
+    public Pile? _Pop12(Number? popCount, Pile? fromPile)
     {
         if (popCount is null || fromPile is null)
             return null;
@@ -57,7 +57,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? _Let1Choose23(PlayerBase? player, Number? chooseCount, PileBase? fromPile)
+    public Pile? _Let1Choose23(PlayerBase? player, Number? chooseCount, Pile? fromPile)
     {
         if (player is null || chooseCount is null || fromPile is null)
             return null;
@@ -65,7 +65,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? _Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, PileBase? fromPile)
+    public Pile? _Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, Pile? fromPile)
     {
         if (player is null || chooseCount is null || wherePredicate is null || fromPile is null)
             return null;
@@ -73,7 +73,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? _TakeAll1(PileBase? fromPile)
+    public Pile? _TakeAll1(Pile? fromPile)
     {
         if (fromPile is null)
             return null;
@@ -81,7 +81,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public PileBase? _TakeAllWhere12(CardPredicate? wherePredicate, PileBase? fromPile)
+    public Pile? _TakeAllWhere12(CardPredicate? wherePredicate, Pile? fromPile)
     {
         if (wherePredicate is null || fromPile is null)
             return null;
@@ -89,7 +89,7 @@ public abstract class DbgEnvironmentBase
         return default!;
     }
 
-    public void _Put12(PileBase? pile, PileBase? toPile)
+    public void _Put12(Pile? pile, Pile? toPile)
     {
         if (pile is null || toPile is null)
             return;
@@ -97,7 +97,7 @@ public abstract class DbgEnvironmentBase
         // TODO implementation
     }
 
-    public void _Let1Put2Anywhere3(PlayerBase? player, PileBase? pile, PileBase? toPile)
+    public void _Let1Put2Anywhere3(PlayerBase? player, Pile? pile, Pile? toPile)
     {
         if (player is null || pile is null || toPile is null)
             return;
@@ -105,7 +105,7 @@ public abstract class DbgEnvironmentBase
         // TODO implementation
     }
 
-    public void _Let1Arrange2(PlayerBase? player, PileBase? pile)
+    public void _Let1Arrange2(PlayerBase? player, Pile? pile)
     {
         if (player is null || pile is null)
             return;
@@ -114,7 +114,7 @@ public abstract class DbgEnvironmentBase
         runtime.ArrangePile(pile, player);
     }
 
-    public void _Shuffle1(PileBase? pile)
+    public void _Shuffle1(Pile? pile)
     {
         if (pile is null)
             return;
@@ -122,7 +122,7 @@ public abstract class DbgEnvironmentBase
         pile.Cards.OrderBy(c => rng.Next());
     }
 
-    public void _Rotate1(PileBase? pile)
+    public void _Rotate1(Pile? pile)
     {
         if (pile is null)
             return;
@@ -211,9 +211,9 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public PileBase _NewPile()
+    public Pile _NewPile()
     {
-        return new PileBase();
+        return new Pile();
     }
 
     public void _If12(Boolean? condition, Effect? effect)

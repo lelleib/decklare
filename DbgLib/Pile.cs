@@ -1,5 +1,5 @@
 ﻿namespace DbgLib;
-public class PileBase
+public class Pile
 {
     public List<CardBase> Cards { get; set; } = new List<CardBase>();
     public Visibility Visibility { get; set; } = Visibility.AllVisible;

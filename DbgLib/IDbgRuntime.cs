@@ -1,5 +1,5 @@
 namespace DbgLib;
 public interface IDbgRuntime
 {
-    public void ArrangePile(PileBase pile, PlayerBase player);
+    public void ArrangePile(Pile pile, PlayerBase player);
 }
