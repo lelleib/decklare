@@ -8,7 +8,7 @@ using Effect = Action;
 
 public abstract class DbgEnvironmentBase
 {
-    protected class BreakException : Exception { }
+    private class BreakException : Exception { }
 
     private static readonly Random rng = new();
 
