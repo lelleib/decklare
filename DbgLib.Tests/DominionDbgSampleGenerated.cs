@@ -324,10 +324,3 @@ public enum CardType
 
 public enum CardName
 { }
-
-public enum Visibility
-{
-    AllVisible,
-    TopVisible,
-    NoneVisible
-}
