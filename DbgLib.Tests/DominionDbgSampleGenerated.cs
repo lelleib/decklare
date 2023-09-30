@@ -6,11 +6,12 @@ using Effect = Action;
 
 public class DbgEnvironment : DbgEnvironmentBase
 {
-    private Gameplay gamePlay = new Gameplay();
-
+    // Gameplay context
+    public Player[]? AllPlayers;
     // public Supply? Supply; // TODO impl
     public Pile? Trash;
     public Pile? CenterPile;
+    // Player context
     public Pile? Hand;
     public Pile? Deck;
     public Pile? Discard;
@@ -25,7 +26,6 @@ public class DbgEnvironment : DbgEnvironmentBase
     public Player? ActivePlayer;
     public Player? LeftPlayer;
     public Player? RightPlayer;
-    public Player[]? AllPlayers;
     public Player[]? AllOtherPlayers;
 
     public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
@@ -219,10 +219,15 @@ public class DbgEnvironment : DbgEnvironmentBase
     private void _InitDominion(int playerCount)
     { // AllPlayers; Supply, Trash, CenterPile
       // AllOtherPlayers, LeftPlayer, RightPlayer; Action, Buy, Coin, Discount, Victory; Deck, Hand, Discard, InPlay
-        gamePlay = new Gameplay();
+        AllPlayers = new Player[playerCount];
+        // Supply = new Supply();
+        Trash = new Pile();
+        CenterPile = new Pile();
+
+        // Initializing players
         for (int i = 0; i < playerCount; i++)
         {
-            gamePlay.AllPlayers.Add(new Player(this)
+            AllPlayers[i] = new Player(this)
             {
                 Action = 1,
                 Buy = 1,
@@ -233,12 +238,8 @@ public class DbgEnvironment : DbgEnvironmentBase
                 Hand = new Pile(),
                 Discard = new Pile(),
                 InPlay = new Pile()
-            });
+            };
         }
-
-        gamePlay.Supply = new Supply();
-        gamePlay.Trash = new Pile();
-        gamePlay.CenterPile = new Pile();
 
         // Populating supply
         // ...
@@ -246,10 +247,10 @@ public class DbgEnvironment : DbgEnvironmentBase
         // Setting player relation properties
         for (int i = 0; i < playerCount; i++)
         {
-            var player = gamePlay.AllPlayers[playerCount];
-            player.AllOtherPlayers = gamePlay.AllPlayers.Where((p, j) => j != i).ToArray();
-            player.RightPlayer = playerCount == 0 ? gamePlay.AllPlayers.Last() : gamePlay.AllPlayers[playerCount - 1];
-            player.LeftPlayer = playerCount == gamePlay.AllPlayers.Length - 1 ? gamePlay.AllPlayers.First() : gamePlay.AllPlayers[playerCount + 1];
+            var player = AllPlayers[playerCount];
+            player.AllOtherPlayers = AllPlayers.Where((p, j) => j != i).ToArray();
+            player.RightPlayer = playerCount == 0 ? AllPlayers.Last() : AllPlayers[playerCount - 1];
+            player.LeftPlayer = playerCount == AllPlayers.Length - 1 ? AllPlayers.First() : AllPlayers[playerCount + 1];
         }
     }
 }
@@ -267,14 +268,6 @@ public class Card : CardBase
 
 public class Game
 { }
-
-public class Gameplay
-{
-    public Player[] AllPlayers { get; set; } = new Player[0];
-    public Supply Supply { get; set; } = new Supply();
-    public Pile Trash { get; set; } = new Pile();
-    public Pile CenterPile { get; set; } = new Pile();
-}
 
 public class Pile : PileBase
 { }
