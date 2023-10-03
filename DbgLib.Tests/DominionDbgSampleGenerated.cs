@@ -16,7 +16,6 @@ public class DbgEnvironment : DbgEnvironmentBase
     public Pile? Deck;
     public Pile? Discard;
     public Pile? InPlay;
-    public Pile? This;
     public Number? Action;
     public Number? Buy;
     public Number? Coin;
@@ -27,6 +26,8 @@ public class DbgEnvironment : DbgEnvironmentBase
     public Player? LeftPlayer;
     public Player? RightPlayer;
     public Player[]? AllOtherPlayers;
+    // Card context
+    public Card? ThisCard;
 
     public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
     {
