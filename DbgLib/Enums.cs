@@ -1,5 +1,5 @@
 namespace DbgLib;
-public enum Visibility
+public enum VISIBILITY
 {
     AllVisible,
     TopVisible,

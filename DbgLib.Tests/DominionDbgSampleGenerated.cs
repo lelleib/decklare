@@ -69,7 +69,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                             Me,
                             1,
                             (_x) =>
-                                ((Card)_x).Types.Contains(CardType.Action),
+                                ((Card)_x).Types.Contains(CARDTYPE.Action),
                             _fromPile
                             ),
                         Hand,
@@ -256,8 +256,8 @@ public class DbgEnvironment : DbgEnvironmentBase
 
 public class Card : CardBase
 {
-    public CardName Name { get; set; }
-    public CardType[] Types { get; set; } = new CardType[0];
+    public CARDNAME Name { get; set; }
+    public CARDTYPE[] Types { get; set; } = new CARDTYPE[0];
     public Number Cost { get; set; }
     public Effect ActionEffect { get; set; } = () => { };
     public Effect TreasureEffect { get; set; } = () => { };
@@ -312,7 +312,7 @@ public class Player : PlayerBase
 public class Supply : SupplyBase
 { }
 
-public enum CardType
+public enum CARDTYPE
 {
     Action,
     Attack,
@@ -321,5 +321,5 @@ public enum CardType
     Victory
 }
 
-public enum CardName
+public enum CARDNAME
 { }
