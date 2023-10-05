@@ -1,6 +1,5 @@
 namespace DbgLib.Tests.DominionDbgSampleGenerated;
 
-using CardPredicate = Predicate<Card>;
 using Number = Int32;
 using Effect = Action;
 
@@ -29,9 +28,86 @@ public class DbgEnvironment : DbgEnvironmentBase
     // Card context
     public Card? ThisCard;
 
-    public DbgEnvironment(IDbgRuntime runtime) : base(runtime)
-    { }
+    private readonly Card[] _cards;
 
+    // GENERATED
+    public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
+    {
+        _cards = new Card[]
+        {
+            new() {
+                Name = CARDNAME.Cellar,
+                Cost = 2,
+                Types = new CARDTYPE[]{ CARDTYPE.Action },
+                ActionEffect = () =>
+                {
+                    _Plus12
+                    (
+                    1,
+                    Action
+                    );
+
+                    var n = _Let1ChooseNumberWhere2
+                    (
+                    Me,
+                    (_x) =>
+                        _x <= Hand?.Count
+                    );
+
+                    _Let1Choose2ToDiscard
+                    (
+                    Me,
+                    n
+                    );
+
+                    _Draw1
+                    (
+                    n
+                    );
+                }
+            },
+
+            new() {
+                Name = CARDNAME.Bureaucrat,
+                Cost = 4,
+                Types = new CARDTYPE[]{ CARDTYPE.Action, CARDTYPE.Attack },
+                ActionEffect = () =>
+                {
+                    // GAIN 1 Silver:CARDNAME TO Deck
+
+                    _For12
+                    (
+                    AllOtherPlayers,
+                    () =>
+                    {
+                        _1From2And3To4
+                        (
+                        (_fromPile) =>
+                            _Let1Choose2Where34
+                            (
+                            Me,
+                            1,
+                            (_x) =>
+                                ((Card)_x).Types.Contains(CARDTYPE.Victory),
+                            _fromPile
+                            ),
+                        Hand,
+                        (_it, _toPile) =>
+                            _Put12
+                            (
+                            _it,
+                            _toPile
+                            ),
+                        Deck
+                        );
+                    }
+                    );
+                }
+            }
+        };
+    }
+
+    // GENERATED
     protected override void Program()
     {
         _InitDominion
@@ -48,6 +124,8 @@ public class DbgEnvironment : DbgEnvironmentBase
             AllPlayers,
             () =>
             {
+                ActivePlayer = Me;
+
                 _While12
                 (
                 Action > 0,
@@ -194,7 +272,7 @@ public class DbgEnvironment : DbgEnvironmentBase
 
                 _If12
                 (
-                true /*TODO win condition*/,
+                false /*TODO win condition*/,
                 () =>
                 {
                     _Break();
@@ -205,13 +283,67 @@ public class DbgEnvironment : DbgEnvironmentBase
 
             _If12
             (
-            true /*TODO win condition*/,
+            AllPlayers?.All((player) => player.Deck?.Count == 0) /*TODO win condition*/,
             () =>
             {
                 _Break();
             }
             );
         }
+        );
+    }
+
+    private void _Plus12(Number? n, Number? variable)
+    {
+        if (n is null || variable is null)
+            return;
+
+        variable = variable + n;
+    }
+
+    private void _Let1Choose2ToDiscard(Player? player, Number? n)
+    {
+        _1From2And3To4
+        (
+        (_fromPile) =>
+            _Let1Choose23
+            (
+            player,
+            n,
+            _fromPile
+            ),
+        Hand,
+        (_it, _toPile) =>
+            _Put12
+            (
+            _it,
+            _toPile
+            ),
+        Discard
+        );
+    }
+
+    private void _Draw1(Number? n)
+    {
+        if (n is null)
+            return;
+
+        _1From2And3To4
+        (
+        (_fromPile) =>
+            _Pop12
+            (
+            n,
+            _fromPile
+            ),
+        Deck,
+        (_it, _toPile) =>
+            _Put12
+            (
+            _it,
+            _toPile
+            ),
+        Hand
         );
     }
 
@@ -252,6 +384,22 @@ public class DbgEnvironment : DbgEnvironmentBase
             player.LeftPlayer = playerCount == AllPlayers.Length - 1 ? AllPlayers.First() : AllPlayers[playerCount + 1];
         }
     }
+}
+
+// GENERATED
+public enum CARDNAME
+{
+    Cellar,
+    Bureaucrat
+}
+
+public enum CARDTYPE
+{
+    Action,
+    Attack,
+    Reaction,
+    Treasure,
+    Victory
 }
 
 public class Card : CardBase
@@ -310,16 +458,4 @@ public class Player : PlayerBase
 }
 
 public class Supply : SupplyBase
-{ }
-
-public enum CARDTYPE
-{
-    Action,
-    Attack,
-    Reaction,
-    Treasure,
-    Victory
-}
-
-public enum CARDNAME
 { }

@@ -1,6 +1,7 @@
 namespace DbgLib;
 
 using CardPredicate = Predicate<CardBase>;
+using NumberPredicate = Predicate<Int32>;
 using Number = Int32;
 using TakeCommand = Func<Pile?, Pile?>;
 using PutCommand = Action<Pile?, Pile?>;
@@ -217,5 +218,13 @@ public abstract class DbgEnvironmentBase
         {
             effect.Invoke();
         }
+    }
+
+    public Number? _Let1ChooseNumberWhere2(PlayerBase? player, NumberPredicate? wherePredicate)
+    {
+        if (player is null || wherePredicate is null)
+            return null;
+
+        return default!;
     }
 }
