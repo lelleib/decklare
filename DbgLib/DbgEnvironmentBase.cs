@@ -14,26 +14,18 @@ public abstract class DbgEnvironmentBase
 
     private readonly IDbgRuntime runtime;
 
-    private Effect? program;
-
     public DbgEnvironmentBase(IDbgRuntime runtime)
     {
         this.runtime = runtime;
     }
 
-    protected void InitProgram(Effect program)
-    {
-        this.program = program;
-    }
+    protected abstract void Program();
 
     public void Run()
     {
-        if (program is null)
-            return;
-
         try
         {
-            program();
+            Program();
         }
         catch (BreakException)
         { }

@@ -29,171 +29,59 @@ public class DbgEnvironment : DbgEnvironmentBase
     // Card context
     public Card? ThisCard;
 
-    public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
-    {
-        void program()
-        {
-            _InitDominion
-            (
-            3
-            );
+    public DbgEnvironment(IDbgRuntime runtime) : base(runtime)
+    { }
 
-            _Repeat1
+    protected override void Program()
+    {
+        _InitDominion
+        (
+        3
+        );
+
+        _Repeat1
+        (
+        () =>
+        {
+            _For12
             (
+            AllPlayers,
             () =>
             {
-                _For12
+                _While12
                 (
-                AllPlayers,
+                Action > 0,
                 () =>
                 {
-                    _While12
+                    _Let1Choose2From3And4
                     (
-                    Action > 0,
+                    Me,
+                    1,
                     () =>
                     {
-                        _Let1Choose2From3And4
-                        (
-                        Me,
-                        1,
-                        () =>
-                        {
-                            var card_to_play = _NewPile();
+                        var card_to_play = _NewPile();
 
-                            _1From2And3To4
+                        _1From2And3To4
+                        (
+                        (_fromPile) =>
+                            _Let1Choose2Where34
                             (
-                            (_fromPile) =>
-                                _Let1Choose2Where34
-                                (
-                                Me,
-                                1,
-                                (_x) =>
-                                    ((Card)_x).Types.Contains(CardType.Action),
-                                _fromPile
-                                ),
-                            Hand,
-                            (_it, _toPile) =>
-                                _Put12
-                                (
-                                _it,
-                                _toPile
-                                ),
-                            card_to_play
-                            );
-                        },
-                        () =>
-                        {
-                            _Break();
-                        }
-                        );
-                    }
-                    );
-
-                    _While12
-                    (
-                    Buy > 0,
-                    () =>
-                    {
-                        _Let1Choose2From3And4
-                        (
-                        Me,
-                        1,
-                        () =>
-                        {
-                            var card = (Card?)_1From2And3To4
+                            Me,
+                            1,
+                            (_x) =>
+                                ((Card)_x).Types.Contains(CardType.Action),
+                            _fromPile
+                            ),
+                        Hand,
+                        (_it, _toPile) =>
+                            _Put12
                             (
-                            (_fromPile) =>
-                                _Let1Choose2Where34
-                                (
-                                Me,
-                                1,
-                                (_x) =>
-                                    ((Card)_x).Cost - Discount < Coin,
-                                _fromPile
-                                ),
-                            Hand,
-                            (_it, _toPile) =>
-                                _Put12
-                                (
-                                _it,
-                                _toPile
-                                ),
-                            Discard
-                            );
-
-                            Coin = (Coin - (card?.Cost - Discount));
-                        },
-                        () =>
-                        {
-                            _Break();
-                        }
+                            _it,
+                            _toPile
+                            ),
+                        card_to_play
                         );
-                    }
-                    );
-
-                    _1From2And3To4
-                    (
-                    (_fromPile) =>
-                        _TakeAll1
-                        (
-                        _fromPile
-                        ),
-                    Hand,
-                    (_it, _toPile) =>
-                        _Put12
-                        (
-                        _it,
-                        _toPile
-                        ),
-                    Discard
-                    );
-
-                    _1From2And3To4
-                    (
-                    (_fromPile) =>
-                        _TakeAll1
-                        (
-                        _fromPile
-                        ),
-                    InPlay,
-                    (_it, _toPile) =>
-                        _Put12
-                        (
-                        _it,
-                        _toPile
-                        ),
-                    Discard
-                    );
-
-                    _1From2And3To4
-                    (
-                    (_fromPile) =>
-                        _Pop12
-                        (
-                        5,
-                        _fromPile
-                        ),
-                    Deck,
-                    (_it, _toPile) =>
-                        _Put12
-                        (
-                        _it,
-                        _toPile
-                        ),
-                    Hand
-                    );
-
-                    Action = 1;
-
-                    Buy = 1;
-
-                    Coin = 0;
-
-                    Discount = 0;
-
-                    _If12
-                    (
-                    true /*TODO win condition*/,
+                    },
                     () =>
                     {
                         _Break();
@@ -201,6 +89,108 @@ public class DbgEnvironment : DbgEnvironmentBase
                     );
                 }
                 );
+
+                _While12
+                (
+                Buy > 0,
+                () =>
+                {
+                    _Let1Choose2From3And4
+                    (
+                    Me,
+                    1,
+                    () =>
+                    {
+                        var card = (Card?)_1From2And3To4
+                        (
+                        (_fromPile) =>
+                            _Let1Choose2Where34
+                            (
+                            Me,
+                            1,
+                            (_x) =>
+                                ((Card)_x).Cost - Discount < Coin,
+                            _fromPile
+                            ),
+                        Hand,
+                        (_it, _toPile) =>
+                            _Put12
+                            (
+                            _it,
+                            _toPile
+                            ),
+                        Discard
+                        );
+
+                        Coin = (Coin - (card?.Cost - Discount));
+                    },
+                    () =>
+                    {
+                        _Break();
+                    }
+                    );
+                }
+                );
+
+                _1From2And3To4
+                (
+                (_fromPile) =>
+                    _TakeAll1
+                    (
+                    _fromPile
+                    ),
+                Hand,
+                (_it, _toPile) =>
+                    _Put12
+                    (
+                    _it,
+                    _toPile
+                    ),
+                Discard
+                );
+
+                _1From2And3To4
+                (
+                (_fromPile) =>
+                    _TakeAll1
+                    (
+                    _fromPile
+                    ),
+                InPlay,
+                (_it, _toPile) =>
+                    _Put12
+                    (
+                    _it,
+                    _toPile
+                    ),
+                Discard
+                );
+
+                _1From2And3To4
+                (
+                (_fromPile) =>
+                    _Pop12
+                    (
+                    5,
+                    _fromPile
+                    ),
+                Deck,
+                (_it, _toPile) =>
+                    _Put12
+                    (
+                    _it,
+                    _toPile
+                    ),
+                Hand
+                );
+
+                Action = 1;
+
+                Buy = 1;
+
+                Coin = 0;
+
+                Discount = 0;
 
                 _If12
                 (
@@ -212,9 +202,17 @@ public class DbgEnvironment : DbgEnvironmentBase
                 );
             }
             );
-        }
 
-        InitProgram(program);
+            _If12
+            (
+            true /*TODO win condition*/,
+            () =>
+            {
+                _Break();
+            }
+            );
+        }
+        );
     }
 
     private void _InitDominion(int playerCount)
