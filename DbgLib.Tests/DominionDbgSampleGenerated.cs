@@ -2,6 +2,8 @@ namespace DbgLib.Tests.DominionDbgSampleGenerated;
 
 using Number = Int32;
 using Effect = Action;
+using TakeCommand = Func<Pile?, Pile?>;
+using PutCommand = Action<Pile?, Pile?>;
 
 public class DbgEnvironment : DbgEnvironmentBase
 {
@@ -179,7 +181,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                     1,
                     () =>
                     {
-                        var card = (Card?)_1From2And3To4
+                        var card = _1From2And3To4
                         (
                         (_fromPile) =>
                             _Let1Choose2Where34
@@ -383,6 +385,11 @@ public class DbgEnvironment : DbgEnvironmentBase
             player.RightPlayer = playerCount == 0 ? AllPlayers.Last() : AllPlayers[playerCount - 1];
             player.LeftPlayer = playerCount == AllPlayers.Length - 1 ? AllPlayers.First() : AllPlayers[playerCount + 1];
         }
+    }
+
+    private new Card? _1From2And3To4(TakeCommand? takeCommand, Pile? fromPile, PutCommand? putCommand, Pile? toPile)
+    {
+        return (Card?)base._1From2And3To4(takeCommand, fromPile, putCommand, toPile);
     }
 
     protected override void SetPlayerContext(PlayerBase playerBase)
