@@ -358,7 +358,7 @@ public class DbgEnvironment : DbgEnvironmentBase
         // Initializing players
         for (int i = 0; i < playerCount; i++)
         {
-            AllPlayers[i] = new Player(this)
+            AllPlayers[i] = new()
             {
                 Action = 1,
                 Buy = 1,
@@ -383,6 +383,44 @@ public class DbgEnvironment : DbgEnvironmentBase
             player.RightPlayer = playerCount == 0 ? AllPlayers.Last() : AllPlayers[playerCount - 1];
             player.LeftPlayer = playerCount == AllPlayers.Length - 1 ? AllPlayers.First() : AllPlayers[playerCount + 1];
         }
+    }
+
+    protected override void SetPlayerContext(PlayerBase playerBase)
+    {
+        var player = (Player)playerBase;
+
+        AllOtherPlayers = player.AllOtherPlayers;
+        LeftPlayer = player.LeftPlayer;
+        RightPlayer = player.RightPlayer;
+
+        Action = player.Action;
+        Buy = player.Buy;
+        Coin = player.Coin;
+        Discount = player.Discount;
+        Victory = player.Victory;
+
+        Deck = player.Deck;
+        Hand = player.Hand;
+        Discard = player.Discard;
+        InPlay = player.InPlay;
+    }
+
+    protected override void UnsetPlayerContext()
+    {
+        AllOtherPlayers = null;
+        LeftPlayer = null;
+        RightPlayer = null;
+
+        Action = null;
+        Buy = null;
+        Coin = null;
+        Discount = null;
+        Victory = null;
+
+        Deck = null;
+        Hand = null;
+        Discard = null;
+        InPlay = null;
     }
 }
 
@@ -418,8 +456,6 @@ public class Game
 
 public class Player : PlayerBase
 {
-    private DbgEnvironment environment;
-
     public Player[]? AllOtherPlayers { get; set; }
     public Player? LeftPlayer { get; set; }
     public Player? RightPlayer { get; set; }
@@ -432,29 +468,6 @@ public class Player : PlayerBase
     public Pile? Hand { get; set; }
     public Pile? Discard { get; set; }
     public Pile? InPlay { get; set; }
-
-    public Player(DbgEnvironment environment)
-    {
-        this.environment = environment;
-    }
-
-    public override void SetPlayerContext()
-    {
-        environment.AllOtherPlayers = AllOtherPlayers;
-        environment.LeftPlayer = LeftPlayer;
-        environment.RightPlayer = LeftPlayer;
-
-        environment.Action = Action;
-        environment.Buy = Buy;
-        environment.Coin = Coin;
-        environment.Discount = Discount;
-        environment.Victory = Victory;
-
-        environment.Deck = Deck;
-        environment.Hand = Hand;
-        environment.Discard = Discard;
-        environment.InPlay = InPlay;
-    }
 }
 
 public class Supply : SupplyBase

@@ -21,6 +21,8 @@ public abstract class DbgEnvironmentBase
     }
 
     protected abstract void Program();
+    protected abstract void SetPlayerContext(PlayerBase playerBase);
+    protected abstract void UnsetPlayerContext();
 
     public void Run()
     {
@@ -160,7 +162,7 @@ public abstract class DbgEnvironmentBase
         {
             foreach (var player in players)
             {
-                player.SetPlayerContext();
+                SetPlayerContext(player);
                 effect.Invoke();
             }
         }
@@ -168,7 +170,7 @@ public abstract class DbgEnvironmentBase
         { }
         finally
         {
-            // TODO switch context back
+            UnsetPlayerContext();
         }
     }
 
