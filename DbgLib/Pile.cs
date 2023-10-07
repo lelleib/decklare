@@ -7,11 +7,20 @@ public class Pile
     public List<CardBase> Cards { get; set; } = new List<CardBase>();
     public VISIBILITY Visibility { get; set; } = VISIBILITY.AllVisible;
     public List<PlayerBase> Viewers { get; set; } = new List<PlayerBase>();
+
     public Number Count
     {
         get
         {
             return Cards.Count;
+        }
+    }
+
+    public CardBase? TopCard
+    {
+        get
+        {
+            return Cards.FirstOrDefault();
         }
     }
 }
