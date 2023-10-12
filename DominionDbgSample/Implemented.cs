@@ -1,5 +1,6 @@
-
 namespace DominionDbgSample.Implemented;
+
+using DbgLib;
 
 public class TestDbgRuntime : IDbgRuntime
 {

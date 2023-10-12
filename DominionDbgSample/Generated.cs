@@ -1,9 +1,11 @@
 namespace DominionDbgSample.Generated;
 
+using DbgLib;
+
 using Number = Int32;
 using Effect = Action;
-using TakeCommand = Func<Pile?, Pile?>;
-using PutCommand = Action<Pile?, Pile?>;
+using TakeCommand = Func<DbgLib.Pile?, DbgLib.Pile?>;
+using PutCommand = Action<DbgLib.Pile?, DbgLib.Pile?>;
 
 public class DbgEnvironment : DbgEnvironmentBase
 {
