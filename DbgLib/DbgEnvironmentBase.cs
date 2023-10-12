@@ -34,7 +34,7 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public CardBase? _1From2And3To4(TakeCommand? takeCommand, Pile? fromPile, PutCommand? putCommand, Pile? toPile)
+    protected CardBase? _1From2And3To4(TakeCommand? takeCommand, Pile? fromPile, PutCommand? putCommand, Pile? toPile)
     {
         if (takeCommand is null || fromPile is null || putCommand is null || toPile is null)
             return null;
@@ -44,7 +44,7 @@ public abstract class DbgEnvironmentBase
         return pileToMove?.TopCard;
     }
 
-    public Pile? _Pop12(Number? popCount, Pile? fromPile)
+    protected Pile? _Pop12(Number? popCount, Pile? fromPile)
     {
         if (popCount is null || fromPile is null)
             return null;
@@ -54,7 +54,7 @@ public abstract class DbgEnvironmentBase
         return new Pile { Cards = popped };
     }
 
-    public Pile? _Let1Choose23(PlayerBase? player, Number? chooseCount, Pile? fromPile)
+    protected Pile? _Let1Choose23(PlayerBase? player, Number? chooseCount, Pile? fromPile)
     {
         if (player is null || chooseCount is null || fromPile is null)
             return null;
@@ -62,7 +62,7 @@ public abstract class DbgEnvironmentBase
         return default!; // TODO impl
     }
 
-    public Pile? _Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, Pile? fromPile)
+    protected Pile? _Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, Pile? fromPile)
     {
         if (player is null || chooseCount is null || wherePredicate is null || fromPile is null)
             return null;
@@ -70,7 +70,7 @@ public abstract class DbgEnvironmentBase
         return default!; // TODO impl
     }
 
-    public Pile? _TakeAll1(Pile? fromPile)
+    protected Pile? _TakeAll1(Pile? fromPile)
     {
         if (fromPile is null)
             return null;
@@ -80,7 +80,7 @@ public abstract class DbgEnvironmentBase
         return new Pile { Cards = taken };
     }
 
-    public Pile? _TakeAllWhere12(CardPredicate? wherePredicate, Pile? fromPile)
+    protected Pile? _TakeAllWhere12(CardPredicate? wherePredicate, Pile? fromPile)
     {
         if (wherePredicate is null || fromPile is null)
             return null;
@@ -90,7 +90,7 @@ public abstract class DbgEnvironmentBase
         return new Pile { Cards = results[true].ToList() };
     }
 
-    public void _Put12(Pile? pile, Pile? toPile)
+    protected void _Put12(Pile? pile, Pile? toPile)
     {
         if (pile is null || toPile is null)
             return;
@@ -98,7 +98,7 @@ public abstract class DbgEnvironmentBase
         toPile.Cards.InsertRange(0, pile.Cards);
     }
 
-    public void _Let1Put2Anywhere3(PlayerBase? player, Pile? pile, Pile? toPile)
+    protected void _Let1Put2Anywhere3(PlayerBase? player, Pile? pile, Pile? toPile)
     {
         if (player is null || pile is null || toPile is null)
             return;
@@ -106,7 +106,7 @@ public abstract class DbgEnvironmentBase
         // TODO implementation
     }
 
-    public void _Let1Arrange2(PlayerBase? player, Pile? pile)
+    protected void _Let1Arrange2(PlayerBase? player, Pile? pile)
     {
         if (player is null || pile is null)
             return;
@@ -115,7 +115,7 @@ public abstract class DbgEnvironmentBase
         runtime.ArrangePile(pile, player);
     }
 
-    public void _Shuffle1(Pile? pile)
+    protected void _Shuffle1(Pile? pile)
     {
         if (pile is null)
             return;
@@ -123,7 +123,7 @@ public abstract class DbgEnvironmentBase
         pile.Cards.OrderBy(c => rng.Next());
     }
 
-    public void _Rotate1(Pile? pile)
+    protected void _Rotate1(Pile? pile)
     {
         if (pile is null)
             return;
@@ -133,7 +133,7 @@ public abstract class DbgEnvironmentBase
         pile.Cards.Add(first);
     }
 
-    public void _Execute1(Effect? effect)
+    protected void _Execute1(Effect? effect)
     {
         if (effect is null)
             return;
@@ -141,12 +141,12 @@ public abstract class DbgEnvironmentBase
         effect.Invoke();
     }
 
-    public void _Break()
+    protected void _Break()
     {
         throw new BreakException();
     }
 
-    public void _Repeat1(Effect effect)
+    protected void _Repeat1(Effect effect)
     {
         try
         {
@@ -159,7 +159,7 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public void _For12(PlayerBase[]? players, Effect? effect)
+    protected void _For12(PlayerBase[]? players, Effect? effect)
     {
         if (players is null || effect is null)
             return;
@@ -180,7 +180,7 @@ public abstract class DbgEnvironmentBase
         }
     }
 
-    public void _Let1ChooseIf2(PlayerBase? player, Effect? effect)
+    protected void _Let1ChooseIf2(PlayerBase? player, Effect? effect)
     {
         if (player is null || effect is null)
             return;
@@ -188,7 +188,7 @@ public abstract class DbgEnvironmentBase
         // TODO
     }
 
-    public void _Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Effect? effect1, Effect? effect2)
+    protected void _Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Effect? effect1, Effect? effect2)
     {
         if (player is null || choiceNumber is null || effect1 is null || effect2 is null)
             return;
@@ -196,7 +196,7 @@ public abstract class DbgEnvironmentBase
         // TODO
     }
 
-    public void _While12(Boolean? condition, Effect? effect)
+    protected void _While12(Boolean? condition, Effect? effect)
     {
         if (condition is null || effect is null)
             return;
@@ -212,12 +212,12 @@ public abstract class DbgEnvironmentBase
         { }
     }
 
-    public Pile _NewPile()
+    protected Pile _NewPile()
     {
         return new Pile();
     }
 
-    public void _If12(Boolean? condition, Effect? effect)
+    protected void _If12(Boolean? condition, Effect? effect)
     {
         if (condition is null || effect is null)
             return;
@@ -228,7 +228,7 @@ public abstract class DbgEnvironmentBase
         }
     }
 
-    public Number? _Let1ChooseNumberWhere2(PlayerBase? player, NumberPredicate? wherePredicate)
+    protected Number? _Let1ChooseNumberWhere2(PlayerBase? player, NumberPredicate? wherePredicate)
     {
         if (player is null || wherePredicate is null)
             return null;
