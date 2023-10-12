@@ -1,4 +1,4 @@
-namespace DbgLib.Tests.DominionDbgSampleGenerated;
+namespace DominionDbgSample.Generated;
 
 using Number = Int32;
 using Effect = Action;
