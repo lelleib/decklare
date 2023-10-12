@@ -460,11 +460,17 @@ public class Card : CardBase
     public Effect VictoryEffect { get; set; } = () => { };
 }
 
-public class Game
-{ }
+public class Game : GameBase
+{
+    public override PlayerBase[] _Players => throw new NotImplementedException();
+
+    public override Pile[] _CommonPiles => throw new NotImplementedException();
+}
 
 public class Player : PlayerBase
 {
+    public override Pile[] _Piles => throw new NotImplementedException();
+
     public Player[]? AllOtherPlayers { get; set; }
     public Player? LeftPlayer { get; set; }
     public Player? RightPlayer { get; set; }
