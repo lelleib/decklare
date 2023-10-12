@@ -1,2 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using DbgLib;
+
+IDbgRuntime runtime = new DominionDbgSample.Implemented.TestDbgRuntime(); // DLL written by hand
+DbgEnvironmentBase env = new DominionDbgSample.Generated.DbgEnvironment(runtime); // DLL compiled from Dbg description
+env.Run();
