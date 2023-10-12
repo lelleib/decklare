@@ -112,7 +112,7 @@ public abstract class DbgEnvironmentBase
             return;
 
         // TODO implementation
-        runtime.ArrangePile(pile, player);
+        runtime.ArrangePile(player, pile);
     }
 
     protected void _Shuffle1(Pile? pile)

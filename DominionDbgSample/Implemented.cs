@@ -4,7 +4,10 @@ using DbgLib;
 
 public class TestDbgRuntime : IDbgRuntime
 {
-    public Game Game { init => throw new NotImplementedException(); }
+    public void SetGame(GameBase game)
+    {
+        throw new NotImplementedException();
+    }
 
     public void ArrangePile(PlayerBase player, Pile pile)
     {
