@@ -34,6 +34,7 @@ public class DbgEnvironment : DbgEnvironmentBase
     public Card? ThisCard;
 
     private readonly Dictionary<CARDNAME, Card> _cards;
+    private Game _game;
 
     // GENERATED
     public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
@@ -115,6 +116,9 @@ public class DbgEnvironment : DbgEnvironmentBase
         {
             _cards.Add(card.Name, card);
         }
+
+        _game = new();
+        _runtime.SetGame(_game);
     }
 
     // GENERATED
@@ -465,17 +469,34 @@ public class Card : CardBase
 
 public class Game : GameBase
 {
-    public override PlayerBase[] _Players => throw new NotImplementedException();
+    public override PlayerBase[] _Players => AllPlayers ?? Array.Empty<PlayerBase>();
 
-    public override KeyValuePair<string, Pile>[] _CommonPiles => throw new NotImplementedException();
+    public override KeyValuePair<string, Pile>[] _CommonPiles =>
+        new KeyValuePair<string, Pile>[]
+        {
+            new(nameof(Trash), Trash!),
+            new(nameof(CenterPile), CenterPile!)
+        }
+        .Where((o) => o.Value is not null)
+        .ToArray();
 
+    public Player[]? AllPlayers { get; set; }
     public Pile? Trash { get; set; }
     public Pile? CenterPile { get; set; }
 }
 
 public class Player : PlayerBase
 {
-    public override KeyValuePair<string, Pile>[] _Piles => throw new NotImplementedException();
+    public override KeyValuePair<string, Pile>[] _Piles =>
+        new KeyValuePair<string, Pile>[]
+        {
+            new(nameof(Deck), Deck!),
+            new(nameof(Hand), Hand!),
+            new(nameof(Discard), Discard!),
+            new(nameof(InPlay), InPlay!)
+        }
+        .Where((o) => o.Value is not null)
+        .ToArray();
 
     public Player[]? AllOtherPlayers { get; set; }
     public Player? LeftPlayer { get; set; }
