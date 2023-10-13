@@ -33,12 +33,12 @@ public class DbgEnvironment : DbgEnvironmentBase
     // Card context
     public Card? ThisCard;
 
-    private readonly Card[] _cards;
+    private readonly Dictionary<CARDNAME, Card> _cards;
 
     // GENERATED
     public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
     {
-        _cards = new Card[]
+        var cardArray = new Card[]
         {
             new() {
                 Name = CARDNAME.Cellar,
@@ -110,6 +110,11 @@ public class DbgEnvironment : DbgEnvironmentBase
                 }
             }
         };
+        _cards = new();
+        foreach (var card in cardArray)
+        {
+            _cards.Add(card.Name, card);
+        }
     }
 
     // GENERATED
