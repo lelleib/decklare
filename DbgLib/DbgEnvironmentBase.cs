@@ -41,7 +41,7 @@ public abstract class DbgEnvironmentBase
 
         var pileToMove = takeCommand(fromPile);
         putCommand(pileToMove, toPile);
-        return pileToMove?.TopCard;
+        return pileToMove?._TopCard;
     }
 
     protected Pile? _Pop12(Number? popCount, Pile? fromPile)
@@ -49,9 +49,9 @@ public abstract class DbgEnvironmentBase
         if (popCount is null || fromPile is null)
             return null;
 
-        var popped = fromPile.Cards.GetRange(0, (int)popCount);
-        fromPile.Cards.RemoveRange(0, (int)popCount);
-        return new Pile { Cards = popped };
+        var popped = fromPile._Cards.GetRange(0, (int)popCount);
+        fromPile._Cards.RemoveRange(0, (int)popCount);
+        return new Pile { _Cards = popped };
     }
 
     protected Pile? _Let1Choose23(PlayerBase? player, Number? chooseCount, Pile? fromPile)
@@ -75,9 +75,9 @@ public abstract class DbgEnvironmentBase
         if (fromPile is null)
             return null;
 
-        List<CardBase> taken = new(fromPile.Cards);
-        fromPile.Cards.Clear();
-        return new Pile { Cards = taken };
+        List<CardBase> taken = new(fromPile._Cards);
+        fromPile._Cards.Clear();
+        return new Pile { _Cards = taken };
     }
 
     protected Pile? _TakeAllWhere12(CardPredicate? wherePredicate, Pile? fromPile)
@@ -85,9 +85,9 @@ public abstract class DbgEnvironmentBase
         if (wherePredicate is null || fromPile is null)
             return null;
 
-        var results = fromPile.Cards.ToLookup((x) => wherePredicate(x));
-        fromPile.Cards = results[false].ToList();
-        return new Pile { Cards = results[true].ToList() };
+        var results = fromPile._Cards.ToLookup((x) => wherePredicate(x));
+        fromPile._Cards = results[false].ToList();
+        return new Pile { _Cards = results[true].ToList() };
     }
 
     protected void _Put12(Pile? pile, Pile? toPile)
@@ -95,7 +95,7 @@ public abstract class DbgEnvironmentBase
         if (pile is null || toPile is null)
             return;
 
-        toPile.Cards.InsertRange(0, pile.Cards);
+        toPile._Cards.InsertRange(0, pile._Cards);
     }
 
     protected void _Let1Put2Anywhere3(PlayerBase? player, Pile? pile, Pile? toPile)
@@ -120,7 +120,7 @@ public abstract class DbgEnvironmentBase
         if (pile is null)
             return;
 
-        pile.Cards.OrderBy(c => rng.Next());
+        pile._Cards.OrderBy(c => rng.Next());
     }
 
     protected void _Rotate1(Pile? pile)
@@ -128,9 +128,9 @@ public abstract class DbgEnvironmentBase
         if (pile is null)
             return;
 
-        var first = pile.Cards[0];
-        pile.Cards.RemoveAt(0);
-        pile.Cards.Add(first);
+        var first = pile._Cards[0];
+        pile._Cards.RemoveAt(0);
+        pile._Cards.Add(first);
     }
 
     protected void _Execute1(Effect? effect)
