@@ -361,9 +361,6 @@ public class DbgEnvironment : DbgEnvironmentBase
     { // AllPlayers; Supply, Trash, CenterPile
       // AllOtherPlayers, LeftPlayer, RightPlayer; Action, Buy, Coin, Discount, Victory; Deck, Hand, Discard, InPlay
         AllPlayers = new Player[playerCount];
-        // Supply = new Supply();
-        Trash = new Pile();
-        CenterPile = new Pile();
 
         // Initializing players
         for (int i = 0; i < playerCount; i++)
@@ -375,10 +372,7 @@ public class DbgEnvironment : DbgEnvironmentBase
                 Coin = 0,
                 Discount = 0,
                 Victory = 0,
-                Deck = new Pile(), // TODO starting deck
-                Hand = new Pile(),
-                Discard = new Pile(),
-                InPlay = new Pile()
+                // TODO starting deck
             };
         }
 
@@ -488,10 +482,10 @@ public class Player : PlayerBase
     public Number? Coin { get; set; }
     public Number? Discount { get; set; }
     public Number? Victory { get; set; }
-    public Pile? Deck { get; set; }
-    public Pile? Hand { get; set; }
-    public Pile? Discard { get; set; }
-    public Pile? InPlay { get; set; }
+    public Pile? Deck { get; } = new Pile() { _Name = nameof(Deck) };
+    public Pile? Hand { get; } = new Pile() { _Name = nameof(Hand) };
+    public Pile? Discard { get; } = new Pile() { _Name = nameof(Discard) };
+    public Pile? InPlay { get; } = new Pile() { _Name = nameof(InPlay) };
 }
 
 public class Supply : SupplyBase
