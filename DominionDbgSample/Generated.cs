@@ -6,6 +6,7 @@ using Number = Int32;
 using Effect = Action;
 using TakeCommand = Func<DbgLib.Pile?, DbgLib.Pile?>;
 using PutCommand = Action<DbgLib.Pile?, DbgLib.Pile?>;
+using System.Collections.Generic;
 
 public class DbgEnvironment : DbgEnvironmentBase
 {
@@ -451,6 +452,8 @@ public enum CARDTYPE
 
 public class Card : CardBase
 {
+    public override Dictionary<string, object> _Properties => throw new NotImplementedException();
+
     public CARDNAME Name { get; set; }
     public CARDTYPE[] Types { get; set; } = new CARDTYPE[0];
     public Number Cost { get; set; }
@@ -458,6 +461,7 @@ public class Card : CardBase
     public Effect TreasureEffect { get; set; } = () => { };
     public Effect ReactionEffect { get; set; } = () => { };
     public Effect VictoryEffect { get; set; } = () => { };
+
 }
 
 public class Game : GameBase

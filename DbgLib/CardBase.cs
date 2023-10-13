@@ -1,4 +1,5 @@
 ﻿namespace DbgLib;
-public class CardBase
+public abstract class CardBase
 {
+    public abstract Dictionary<string, Object> _Properties { get; }
 }
