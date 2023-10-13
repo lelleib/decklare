@@ -1,5 +1,5 @@
 ﻿namespace DbgLib;
 public abstract class PlayerBase
 {
-    public abstract Pile[] _Piles { get; }
+    public abstract KeyValuePair<string, Pile>[] _Piles { get; }
 }

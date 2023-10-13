@@ -467,12 +467,15 @@ public class Game : GameBase
 {
     public override PlayerBase[] _Players => throw new NotImplementedException();
 
-    public override Pile[] _CommonPiles => throw new NotImplementedException();
+    public override KeyValuePair<string, Pile>[] _CommonPiles => throw new NotImplementedException();
+
+    public Pile? Trash { get; set; }
+    public Pile? CenterPile { get; set; }
 }
 
 public class Player : PlayerBase
 {
-    public override Pile[] _Piles => throw new NotImplementedException();
+    public override KeyValuePair<string, Pile>[] _Piles => throw new NotImplementedException();
 
     public Player[]? AllOtherPlayers { get; set; }
     public Player? LeftPlayer { get; set; }
@@ -482,10 +485,10 @@ public class Player : PlayerBase
     public Number? Coin { get; set; }
     public Number? Discount { get; set; }
     public Number? Victory { get; set; }
-    public Pile? Deck { get; } = new Pile() { _Name = nameof(Deck) };
-    public Pile? Hand { get; } = new Pile() { _Name = nameof(Hand) };
-    public Pile? Discard { get; } = new Pile() { _Name = nameof(Discard) };
-    public Pile? InPlay { get; } = new Pile() { _Name = nameof(InPlay) };
+    public Pile? Deck { get; set; }
+    public Pile? Hand { get; set; }
+    public Pile? Discard { get; set; }
+    public Pile? InPlay { get; set; }
 }
 
 public class Supply : SupplyBase

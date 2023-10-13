@@ -6,8 +6,6 @@ public class Pile
 {
     public List<CardBase> _Cards { get; set; } = new List<CardBase>();
 
-    public string _Name { get; init; } = "UnnamedPile";
-
     public CardBase? _TopCard
     {
         get
