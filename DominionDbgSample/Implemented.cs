@@ -50,6 +50,7 @@ public class TestDbgRuntime : IDbgRuntime
             }
             anotherPile._Cards.Insert(position, pile._Cards[i]);
         }
+        pile._Cards.Clear();
     }
 
     public int[] ChooseFromPile(PlayerBase player, Pile pile, int choiceCount, Predicate<CardBase> predicate)
