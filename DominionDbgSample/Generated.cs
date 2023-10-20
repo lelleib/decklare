@@ -11,10 +11,28 @@ using System.Collections.Generic;
 public class DbgEnvironment : DbgEnvironmentBase
 {
     // Gameplay context
-    public Player[]? AllPlayers;
+    private Player[]? AllPlayers
+    {
+        get => _game.AllPlayers;
+        set => _game.AllPlayers = value;
+    }
+    public Player? ActivePlayer
+    {
+        get => _game.ActivePlayer;
+        set => _game.ActivePlayer = value;
+    }
     // public Supply? Supply; // TODO impl
-    public Pile? Trash;
-    public Pile? CenterPile;
+    private Pile? Trash
+    {
+        get => _game.Trash;
+        set => _game.Trash = value;
+    }
+    private Pile? CenterPile
+    {
+        get => _game.CenterPile;
+        set => _game.CenterPile = value;
+    }
+
     // Player context
     public Pile? Hand;
     public Pile? Deck;
@@ -26,7 +44,6 @@ public class DbgEnvironment : DbgEnvironmentBase
     public Number? Victory;
     public Number? Discount;
     public Player? Me;
-    public Player? ActivePlayer;
     public Player? LeftPlayer;
     public Player? RightPlayer;
     public Player[]? AllOtherPlayers;
@@ -41,6 +58,32 @@ public class DbgEnvironment : DbgEnvironmentBase
     {
         var cardArray = new Card[]
         {
+            new() {
+                Name = CARDNAME.Estate,
+                Cost = 2,
+                Types = new CARDTYPE[]{ CARDTYPE.Victory },
+                VictoryEffect = () =>
+                {
+                    _Plus12
+                    (
+                    1,
+                    Victory
+                    );
+                }
+            },
+            new() {
+                Name = CARDNAME.Copper,
+                Cost = 0,
+                Types = new CARDTYPE[]{ CARDTYPE.Treasure },
+                TreasureEffect = () =>
+                {
+                    _Plus12
+                    (
+                    1,
+                    Coin
+                    );
+                }
+            },
             new() {
                 Name = CARDNAME.Cellar,
                 Cost = 2,
@@ -364,32 +407,45 @@ public class DbgEnvironment : DbgEnvironmentBase
     private void _InitDominion(int playerCount)
     { // AllPlayers; Supply, Trash, CenterPile
       // AllOtherPlayers, LeftPlayer, RightPlayer; Action, Buy, Coin, Discount, Victory; Deck, Hand, Discard, InPlay
-        AllPlayers = new Player[playerCount];
+        _game.AllPlayers = new Player[playerCount];
 
         // Initializing players
         for (int i = 0; i < playerCount; i++)
         {
-            AllPlayers[i] = new()
+            _game.AllPlayers[i] = new()
             {
                 Action = 1,
                 Buy = 1,
                 Coin = 0,
                 Discount = 0,
                 Victory = 0,
-                // TODO starting deck
+                Deck = new Pile()
             };
+            var player = _game.AllPlayers[i];
+            player.Deck = new()
+            {
+                Viewers = new() { player },
+                Visibility = VISIBILITY.AllVisible,
+                _Cards =
+                    Enumerable.Repeat(_cards[CARDNAME.Estate], 3).Concat
+                    (
+                        Enumerable.Repeat(_cards[CARDNAME.Copper], 7)
+                    ).ToList<CardBase>()
+            };
+            _Shuffle1(player.Deck);
         }
 
         // Populating supply
         // ...
 
         // Setting player relation properties
+        var players = _game.AllPlayers;
         for (int i = 0; i < playerCount; i++)
         {
-            var player = AllPlayers[playerCount];
-            player.AllOtherPlayers = AllPlayers.Where((p, j) => j != i).ToArray();
-            player.RightPlayer = playerCount == 0 ? AllPlayers.Last() : AllPlayers[playerCount - 1];
-            player.LeftPlayer = playerCount == AllPlayers.Length - 1 ? AllPlayers.First() : AllPlayers[playerCount + 1];
+            var player = players[i];
+            player.AllOtherPlayers = players.Where((p, j) => j != i).ToArray();
+            player.RightPlayer = i == 0 ? players.Last() : players[playerCount - 1];
+            player.LeftPlayer = i == players.Length - 1 ? players.First() : players[playerCount + 1];
         }
     }
 
@@ -440,6 +496,8 @@ public class DbgEnvironment : DbgEnvironmentBase
 // GENERATED
 public enum CARDNAME
 {
+    Estate,
+    Copper,
     Cellar,
     Bureaucrat
 }
@@ -481,6 +539,7 @@ public class Game : GameBase
         .ToArray();
 
     public Player[]? AllPlayers { get; set; }
+    public Player? ActivePlayer { get; set; }
     public Pile? Trash { get; set; }
     public Pile? CenterPile { get; set; }
 }
