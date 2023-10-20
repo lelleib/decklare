@@ -444,8 +444,8 @@ public class DbgEnvironment : DbgEnvironmentBase
         {
             var player = players[i];
             player.AllOtherPlayers = players.Where((p, j) => j != i).ToArray();
-            player.RightPlayer = i == 0 ? players.Last() : players[playerCount - 1];
-            player.LeftPlayer = i == players.Length - 1 ? players.First() : players[playerCount + 1];
+            player.RightPlayer = i == 0 ? players.Last() : players[i - 1];
+            player.LeftPlayer = i == players.Length - 1 ? players.First() : players[i + 1];
         }
     }
 
