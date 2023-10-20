@@ -54,20 +54,26 @@ public abstract class DbgEnvironmentBase
         return new Pile { _Cards = popped };
     }
 
-    protected Pile? _Let1Choose23(PlayerBase? player, Number? chooseCount, Pile? fromPile)
+    protected Pile? _Let1Choose23(PlayerBase? player, Number? choiceCount, Pile? fromPile)
     {
-        if (player is null || chooseCount is null || fromPile is null)
+        if (player is null || choiceCount is null || fromPile is null)
             return null;
 
-        return default!; // TODO impl
+        int[] chosenIndices = runtime.ChooseFromPile(player, fromPile, (int)choiceCount, (_) => true);
+        var newPile = new Pile() { _Cards = chosenIndices.Select((i) => fromPile._Cards[i]).ToList() };
+        fromPile._Cards.RemoveAll((c) => newPile._Cards.Contains(c));
+        return newPile;
     }
 
-    protected Pile? _Let1Choose2Where34(PlayerBase? player, Number? chooseCount, CardPredicate? wherePredicate, Pile? fromPile)
+    protected Pile? _Let1Choose2Where34(PlayerBase? player, Number? choiceCount, CardPredicate? wherePredicate, Pile? fromPile)
     {
-        if (player is null || chooseCount is null || wherePredicate is null || fromPile is null)
+        if (player is null || choiceCount is null || wherePredicate is null || fromPile is null)
             return null;
 
-        return default!; // TODO impl
+        int[] chosenIndices = runtime.ChooseFromPile(player, fromPile, (int)choiceCount, wherePredicate);
+        var newPile = new Pile() { _Cards = chosenIndices.Select((i) => fromPile._Cards[i]).ToList() };
+        fromPile._Cards.RemoveAll((c) => newPile._Cards.Contains(c));
+        return newPile;
     }
 
     protected Pile? _TakeAll1(Pile? fromPile)
@@ -103,7 +109,7 @@ public abstract class DbgEnvironmentBase
         if (player is null || pile is null || toPile is null)
             return;
 
-        // TODO implementation
+        runtime.PutPileAnywhereToAnotherPile(player, pile, toPile);
     }
 
     protected void _Let1Arrange2(PlayerBase? player, Pile? pile)
@@ -111,7 +117,6 @@ public abstract class DbgEnvironmentBase
         if (player is null || pile is null)
             return;
 
-        // TODO implementation
         runtime.ArrangePile(player, pile);
     }
 
@@ -120,7 +125,7 @@ public abstract class DbgEnvironmentBase
         if (pile is null)
             return;
 
-        pile._Cards.OrderBy(c => rng.Next());
+        pile._Cards = pile._Cards.OrderBy(c => rng.Next()).ToList();
     }
 
     protected void _Rotate1(Pile? pile)
@@ -185,7 +190,11 @@ public abstract class DbgEnvironmentBase
         if (player is null || effect is null)
             return;
 
-        // TODO
+        int choice = runtime.ChooseFromOptions(player, 2, 1)[0];
+        if (choice == 0)
+        {
+            effect.Invoke();
+        }
     }
 
     protected void _Let1Choose2From3And4(PlayerBase? player, Number? choiceNumber, Effect? effect1, Effect? effect2)
@@ -193,7 +202,15 @@ public abstract class DbgEnvironmentBase
         if (player is null || choiceNumber is null || effect1 is null || effect2 is null)
             return;
 
-        // TODO
+        int choice = runtime.ChooseFromOptions(player, 2, 1)[0];
+        if (choice == 0)
+        {
+            effect1.Invoke();
+        }
+        else
+        {
+            effect2.Invoke();
+        }
     }
 
     protected void _While12(Boolean? condition, Effect? effect)
@@ -233,6 +250,6 @@ public abstract class DbgEnvironmentBase
         if (player is null || wherePredicate is null)
             return null;
 
-        return default!;
+        return runtime.ChooseNumber(player, wherePredicate);
     }
 }
