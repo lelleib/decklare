@@ -444,6 +444,7 @@ public class DbgEnvironment : DbgEnvironmentBase
         {
             var player = players[i];
             player.AllOtherPlayers = players.Where((p, j) => j != i).ToArray();
+            player.Me = player;
             player.RightPlayer = i == 0 ? players.Last() : players[i - 1];
             player.LeftPlayer = i == players.Length - 1 ? players.First() : players[i + 1];
         }
@@ -458,6 +459,7 @@ public class DbgEnvironment : DbgEnvironmentBase
     {
         var player = (Player)playerBase;
 
+        Me = player.Me;
         AllOtherPlayers = player.AllOtherPlayers;
         LeftPlayer = player.LeftPlayer;
         RightPlayer = player.RightPlayer;
@@ -476,6 +478,7 @@ public class DbgEnvironment : DbgEnvironmentBase
 
     protected override void UnsetPlayerContext()
     {
+        Me = null;
         AllOtherPlayers = null;
         LeftPlayer = null;
         RightPlayer = null;
@@ -558,6 +561,7 @@ public class Player : PlayerBase
         .ToArray();
 
     public Player[]? AllOtherPlayers { get; set; }
+    public Player? Me { get; set; }
     public Player? LeftPlayer { get; set; }
     public Player? RightPlayer { get; set; }
     public Number? Action { get; set; }
