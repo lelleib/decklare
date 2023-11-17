@@ -150,6 +150,10 @@ public class TestDbgRuntime : IDbgRuntime
         var pileName = namedPile.Key;
         var pile = namedPile.Value;
         PrintIndented($"Pile '{pileName}':", indentLevel);
+        if (pile.Count == 0)
+        {
+            PrintIndented("(empty)", indentLevel + 1);
+        }
         int cardIndex = 0;
         foreach (var card in pile._Cards)
         {

@@ -408,6 +408,8 @@ public class DbgEnvironment : DbgEnvironmentBase
     { // AllPlayers; Supply, Trash, CenterPile
       // AllOtherPlayers, LeftPlayer, RightPlayer; Action, Buy, Coin, Discount, Victory; Deck, Hand, Discard, InPlay
         _game.AllPlayers = new Player[playerCount];
+        _game.CenterPile = new Pile();
+        _game.Trash = new Pile();
 
         // Initializing players
         for (int i = 0; i < playerCount; i++)
