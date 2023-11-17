@@ -1,6 +1,7 @@
 namespace DominionDbgSample.Implemented;
 
 using DbgLib;
+using DominionDbgSample.Generated;
 
 public class TestDbgRuntime : IDbgRuntime
 {
@@ -149,27 +150,30 @@ public class TestDbgRuntime : IDbgRuntime
     {
         var pileName = namedPile.Key;
         var pile = namedPile.Value;
-        PrintIndented($"Pile '{pileName}':", indentLevel);
         if (pile.Count == 0)
         {
-            PrintIndented("(empty)", indentLevel + 1);
+            PrintIndented($"Pile '{pileName}' (empty)", indentLevel);
         }
-        int cardIndex = 0;
-        foreach (var card in pile._Cards)
+        else
         {
-            if (pile.Viewers.Contains(player) &&
-                (pile.Visibility == VISIBILITY.AllVisible ||
-                    (pile.Visibility == VISIBILITY.TopVisible && cardIndex == 0)))
+            PrintIndented($"Pile '{pileName}':", indentLevel);
+            int cardIndex = 0;
+            foreach (var card in pile._Cards)
             {
-                PrintIndented($"Card{cardIndex++}:", indentLevel + 1);
-                foreach (var prop in card._Properties)
+                if (pile.Viewers.Contains(player) &&
+                    (pile.Visibility == VISIBILITY.AllVisible ||
+                        (pile.Visibility == VISIBILITY.TopVisible && cardIndex == 0)))
                 {
-                    PrintIndented(string.Format("{0,-10}:{1,10}", prop.Key, prop.Value), indentLevel + 2);
+                    PrintIndented($"Card{cardIndex++}:", indentLevel + 1);
+                    foreach (var prop in card._Properties)
+                    {
+                        PrintIndented(string.Format("{0,-10}:{1,10}", prop.Key, prop.Value), indentLevel + 2);
+                    }
                 }
-            }
-            else
-            {
-                PrintIndented($"Card{cardIndex++} (not visible)", indentLevel + 1);
+                else
+                {
+                    PrintIndented($"Card{cardIndex++} (not visible)", indentLevel + 1);
+                }
             }
         }
     }
