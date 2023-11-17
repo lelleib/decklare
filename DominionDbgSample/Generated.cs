@@ -516,7 +516,19 @@ public enum CARDTYPE
 
 public class Card : CardBase
 {
-    public override Dictionary<string, object> _Properties => throw new NotImplementedException();
+    public override Dictionary<string, object> _Properties =>
+        new KeyValuePair<string, object>[]
+        {
+            new(nameof(Name), Name!),
+            new(nameof(Types), Types!),
+            new(nameof(Cost), Cost!),
+            new(nameof(ActionEffect), ActionEffect!),
+            new(nameof(TreasureEffect), TreasureEffect!),
+            new(nameof(ReactionEffect), ReactionEffect!),
+            new(nameof(VictoryEffect), VictoryEffect!)
+        }
+        .Where((o) => o.Value is not null)
+        .ToDictionary(o => o.Key, o => o.Value);
 
     public CARDNAME Name { get; set; }
     public CARDTYPE[] Types { get; set; } = new CARDTYPE[0];
