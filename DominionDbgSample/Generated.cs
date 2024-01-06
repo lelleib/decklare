@@ -56,12 +56,13 @@ public class DbgEnvironment : DbgEnvironmentBase
     // GENERATED
     public DbgEnvironment(IDbgRuntime _runtime) : base(_runtime)
     {
-        var cardArray = new Card[]
+        _cards = new()
         {
-            new() {
+            [CARDNAME.Estate] = new()
+            {
                 Name = CARDNAME.Estate,
                 Cost = 2,
-                Types = new CARDTYPE[]{ CARDTYPE.Victory },
+                Types = new CARDTYPE[] { CARDTYPE.Victory },
                 VictoryEffect = () =>
                 {
                     _Plus12
@@ -71,10 +72,12 @@ public class DbgEnvironment : DbgEnvironmentBase
                     );
                 }
             },
-            new() {
+
+            [CARDNAME.Copper] = new()
+            {
                 Name = CARDNAME.Copper,
                 Cost = 0,
-                Types = new CARDTYPE[]{ CARDTYPE.Treasure },
+                Types = new CARDTYPE[] { CARDTYPE.Treasure },
                 TreasureEffect = () =>
                 {
                     _Plus12
@@ -84,10 +87,12 @@ public class DbgEnvironment : DbgEnvironmentBase
                     );
                 }
             },
-            new() {
+
+            [CARDNAME.Cellar] = new()
+            {
                 Name = CARDNAME.Cellar,
                 Cost = 2,
-                Types = new CARDTYPE[]{ CARDTYPE.Action },
+                Types = new CARDTYPE[] { CARDTYPE.Action },
                 ActionEffect = () =>
                 {
                     _Plus12
@@ -116,10 +121,11 @@ public class DbgEnvironment : DbgEnvironmentBase
                 }
             },
 
-            new() {
+            [CARDNAME.Bureaucrat] = new()
+            {
                 Name = CARDNAME.Bureaucrat,
                 Cost = 4,
-                Types = new CARDTYPE[]{ CARDTYPE.Action, CARDTYPE.Attack },
+                Types = new CARDTYPE[] { CARDTYPE.Action, CARDTYPE.Attack },
                 ActionEffect = () =>
                 {
                     // GAIN 1 Silver:CARDNAME TO Deck
@@ -154,11 +160,6 @@ public class DbgEnvironment : DbgEnvironmentBase
                 }
             }
         };
-        _cards = new();
-        foreach (var card in cardArray)
-        {
-            _cards.Add(card.Name, card);
-        }
 
         _game = new();
         _runtime.SetGame(_game);
