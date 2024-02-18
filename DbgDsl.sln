@@ -1,19 +1,19 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeProcessor", "CodeProcessor\CodeProcessor.csproj", "{A6D76CBB-B2B7-48E6-98E7-2CF1E38A361D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeProcessor", "CodeProcessor\CodeProcessor.csproj", "{A6D76CBB-B2B7-48E6-98E7-2CF1E38A361D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbgLib", "DbgLib\DbgLib.csproj", "{1338F533-53F1-42DF-8978-C5DD2E96D7E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbgLib", "DbgLib\DbgLib.csproj", "{1338F533-53F1-42DF-8978-C5DD2E96D7E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbgLib.Tests", "DbgLib.Tests\DbgLib.Tests.csproj", "{9B199FA2-8C60-4CA1-99FF-9ABD9358D0F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbgLib.Tests", "DbgLib.Tests\DbgLib.Tests.csproj", "{9B199FA2-8C60-4CA1-99FF-9ABD9358D0F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbgRunner", "DbgRunner\DbgRunner.csproj", "{71667703-C5AA-49CF-AEF4-09882FF8EAB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbgRunner", "DbgRunner\DbgRunner.csproj", "{71667703-C5AA-49CF-AEF4-09882FF8EAB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeProcessor.Tests", "CodeProcessor.Tests\CodeProcessor.Tests.csproj", "{56A84277-F0D5-4703-B422-20A8EA742DF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeProcessor.Tests", "CodeProcessor.Tests\CodeProcessor.Tests.csproj", "{56A84277-F0D5-4703-B422-20A8EA742DF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominionDbgSample", "DominionDbgSample\DominionDbgSample.csproj", "{3BA7CF55-ABDB-416A-A063-2EE2C7A72016}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominionDbgSample", "DominionDbgSample\DominionDbgSample.csproj", "{3BA7CF55-ABDB-416A-A063-2EE2C7A72016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
